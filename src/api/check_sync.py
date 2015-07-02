@@ -15,7 +15,7 @@ class CheckSync():
 
     '''
         cluster will not  be existed,
-        when the first to start container-manager in a new server cluster
+        when the first to start container-monitor-agent in a new server cluster
          
     '''
     
@@ -26,7 +26,7 @@ class CheckSync():
             return
         
         zkOper = Common_ZkOpers()
-
+        
         existed = zkOper.existCluster()
         if existed:
             self.sync_server_cluster()
