@@ -1,10 +1,10 @@
 #!/bin/sh
 #
-# container-manager
+# container-monitor-agent
 # Author: 	zhoubingzheng <zhoubingzheng@letv.com>
 #
 # chkconfig: 2345 09 92
-# description: container manager
+# description: container monitor agent
 
 ### BEGIN INIT INFO
 # Provides:          letv
@@ -12,10 +12,10 @@
 # Required-Stop:
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: container manager
+# Short-Description: container monitor agent
 ### END INIT INFO
 
-NAME=container-manager
+NAME=container-monitor-agent
 
 # source function library
 . /etc/rc.d/init.d/functions
@@ -39,7 +39,7 @@ start () {
 	touch $PIDFILE
 	chown $USER:$GROUP $PIDFILE
 
-	MMCMD="python /opt/letv/container-manager/api/containerManager.py >>$CONSOLELOG 2>&1 & 	\
+	MMCMD="python /opt/letv/container-monitor-agent/api/containerMonitorAgent.py >>$CONSOLELOG 2>&1 & 	\
 		echo "'$! >'"$PIDFILE"
 
         echo -n $"Starting ${NAME}:"
