@@ -1,6 +1,6 @@
-adminUser=root
-adminPassword=cm9vdA==
-clusterName=test_cluster
+adminUser=
+adminPassword=
+clusterName=
 clusterUUID=
 dataNodeListOnCluster=
 NIC=

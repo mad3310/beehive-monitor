@@ -25,7 +25,7 @@ define('smtp_tls', default = False, type = bool, help = 'smtp tls')
 
 
 define("base_dir", default=base_dir, help="project base dir")
-define("container_manager_property",default=join(base_dir, "config","containerManager.property"), help="container manager config file")
+define("container_manager_property",default=join(base_dir, "config","containerMonitor_agent.property"), help="container manager config file")
 define("data_node_property",default=join(base_dir,"config","dataNode.property"), help="data node config file")
 define("server_cluster_property",default=join(base_dir,"config","serverCluster.property"), help="server cluster config file")
 
