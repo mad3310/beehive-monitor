@@ -48,7 +48,7 @@ class ContainerCluster_Opers(Abstract_Container_Opers):
                 cluster_exist = self.__get_cluster_status(nodes)
                 cluster.setdefault('status', cluster_exist)
                 cluster.setdefault('clusterName', cluster_name)
-                logging.info('sync action, cluster name:%s' % cluster)
+                logging.info('sync action, cluster name:%s' % cluster_name)
                 
                 zkOper = Requests_ZkOpers()
                 cluster_info = zkOper.retrieve_container_cluster_info(cluster_name)
