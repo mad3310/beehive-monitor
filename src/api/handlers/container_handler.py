@@ -35,33 +35,6 @@ class ContainerHandler(APIHandler):
         return docker_model
 
 
-#     def delete(self, container_name):
-# #         args = self.get_all_arguments()
-# #         container_name = args.get('containerName')
-#         logging.info('container_name: %s' % container_name)
-#         exists = self.container_opers.check_container_exists(container_name)
-#         if not exists:
-#             massage = {}
-#             massage.setdefault("status", "not exist")
-#             massage.setdefault("message", "no need this operation, there is no such a container!")
-#             self.finish(massage)
-#             return
-#         
-#         try:
-#             logging.info( container_name )
-#             self.container_opers.destroy(container_name)
-#         except:
-#             logging.error( str(traceback.format_exc()) )
-#             raise HTTPAPIError(status_code=500, error_detail="container __start raise exception!",\
-#                                 notification = "direct", \
-#                                 log_message= "container __start raise exception",\
-#                                 response =  "container __start raise exception, please check!!")
-#          
-#         dict = {}
-#         dict.setdefault("message", "remove container has been done but need some time, please wait a moment and check the result!")
-#         self.finish(dict)
-
-
 @require_basic_auth
 class StartContainerHandler(APIHandler):
      

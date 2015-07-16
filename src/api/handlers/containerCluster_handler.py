@@ -109,7 +109,6 @@ class CheckClusterSyncHandler(APIHandler):
     def get(self):
         _clusterInfo =  self.container_cluster_opers.sync()
         logging.info('data:%s' % str(_clusterInfo))
-        
         result = {}
         result.setdefault('data', _clusterInfo)
         self.finish(result)

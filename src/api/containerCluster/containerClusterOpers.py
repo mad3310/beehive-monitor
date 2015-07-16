@@ -46,10 +46,11 @@ class ContainerCluster_Opers(Abstract_Container_Opers):
             cluster_exist = self.__get_cluster_status(nodes)
             cluster.setdefault('status', cluster_exist)
             cluster.setdefault('clusterName', cluster_name)
+            logging.info(cluster_name)
             for _,node_value in nodes.items():
                 container_info = node_value.get('container_info')
                 con = Container_Model()
-                logging.info('container_info : %s' % str(container_info))
+                #logging.info('container_info : %s' % str(container_info))
                 create_info = con.create_info(container_info)
                 nodeInfo.append(create_info)
             cluster.setdefault('nodeInfo', nodeInfo)
