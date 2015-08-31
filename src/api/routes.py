@@ -14,7 +14,6 @@ handlers = [
     (r"/containerCluster/sync", CheckClusterSyncHandler),
     
     (r"/containerCluster/status/(.*)", CheckContainerClusterStatusHandler),
-    (r"/containerCluster/createResult/(.*)", CheckContainerClusterCreateResultHandler),
     
     (r"/containerCluster/stat/(.*)/memory", GatherClusterMemeoyHandler),
     (r"/containerCluster/stat/(.*)/cpuacct", GatherClusterCpuacctHandler),

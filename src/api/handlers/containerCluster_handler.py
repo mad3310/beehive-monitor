@@ -112,16 +112,3 @@ class CheckClusterSyncHandler(APIHandler):
         result = {}
         result.setdefault('data', _clusterInfo)
         self.finish(result)
-
-
-@require_basic_auth
-class CheckContainerClusterCreateResultHandler(APIHandler):
-    '''
-    classdocs
-    '''
-    containerClusterOpers = ContainerCluster_Opers()
-    
-    # eg. curl --user root:root -X GET http://10.154.156.150:8888/containerCluster/status/dh
-    def get(self, containerClusterName):
-        result = self.containerClusterOpers.create_result(containerClusterName)
-        self.finish(result)
