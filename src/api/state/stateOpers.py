@@ -12,6 +12,7 @@ from utils.invokeCommand import InvokeCommand
 from docker_letv.dockerOpers import Docker_Opers
 from container.container_model import Container_Model
 from tornado.options import options
+from utils.exceptions import UserVisiableException
 
 
 class StateOpers(object):
@@ -31,6 +32,8 @@ class StateOpers(object):
         self.root_mnt_path = '/srv/docker/devicemapper/mnt/%s' % self.container_id
         self.memory_stat_path = '/cgroup/memory/lxc/%s/memory.stat' % self.container_id
         self.cpuacct_stat_path = '/cgroup/cpuacct/lxc/%s/cpuacct.stat' % self.container_id
+        self.cpushares_path = '/cgroup/cpu/lxc/%s/cpu.shares' % self.container_id
+        self.cpuset_path = '/cgroup/cpu/lxc/%s/cpuset.cpus' % self.container_id
 
     def get_container_id(self):
         _inspect = self.docker_opers.inspect_container(self.container_name)
@@ -84,6 +87,12 @@ class StateOpers(object):
     def get_cpuacct_stat_value(self):
         value = self.get_file_value(self.cpuacct_stat_path)
         return value.split('\n')
+
+    def get_cpushares_value(self):
+        return self.get_file_value(self.cpushares_path)
+
+    def get_cpuset_value(self):
+        return self.get_file_value(self.cpuset_path)
 
     def get_memory_stat_item(self):
         mem_stat_dict = {}
@@ -191,17 +200,31 @@ class StateOpers(object):
         result.setdefault('volumes_mount', volume_mnt_size)
         return result
 
-    def __double_memsw_size(self):
+    def __extend_memsw(self, times):
         memsw_value = self.get_con_limit_memsw()
-        double_value = int(memsw_value)*2
-        return self.echo_value_to_file(double_value, self.limit_memsw_path)
+        extend_value = int(memsw_value)*int(times)
+        if not self.echo_value_to_file(extend_value, self.limit_memsw_path):
+            raise UserVisiableException('extend container: %s memroy swap faild, please check!' % self.container_name)
+        return extend_value
 
-    def __double_mem_size(self):
+    def __extend_mem(self, times):
         mem_value = self.get_con_limit_mem()
-        double_value = int(mem_value)*2
-        return self.echo_value_to_file(double_value, self.limit_mem_path)
+        extend_value = int(mem_value)*int(times)
+        if not self.echo_value_to_file(extend_value, self.limit_mem_path):
+            raise UserVisiableException('extend container: %s memory faild, please check!' % self.container_name)
+        return extend_value
 
-    def double_mem(self):
-        memsw_ret = self.__double_memsw_size()
-        mem_ret = self.__double_mem_size()
+    def extend_memory(self, times):
+        memsw_ret = self.__extend_memsw(times)
+        mem_ret = self.__extend_mem(times)
         return memsw_ret and mem_ret
+
+    def set_cpushares(self, cpushares="1024"):
+        if not self.echo_value_to_file(cpushares, self.cpushares_path):
+            raise UserVisiableException('set container :%s cpu.shares value:% failed' % (self.container_name, cpushares))
+        return self.get_cpushares_value()
+
+    def set_cpuset(self, cpus):
+        if not self.echo_value_to_file(cpus, self.cpuset_path):
+            raise UserVisiableException('set container :%s cpus value:%s failed' % (self.container_name, cpus))
+        return self.get_cpuset_value()

@@ -5,10 +5,8 @@ Created on Sep 8, 2014
 
 @author: root
 '''
-import kazoo
 import logging
 
-from tornado.web import asynchronous
 from tornado_letv.tornado_basic_auth import require_basic_auth
 from base import APIHandler
 from utils.exceptions import HTTPAPIError
