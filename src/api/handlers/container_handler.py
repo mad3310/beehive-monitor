@@ -86,6 +86,10 @@ class GatherContainerNetworkioHandler(APIHandler):
         self.finish(result)
 
 
+class GatherContainerIopsHandler(APIHandler):
+    pass
+
+
 @require_basic_auth
 class CheckContainerStatusHandler(APIHandler):
     '''

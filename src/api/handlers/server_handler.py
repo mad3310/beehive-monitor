@@ -13,16 +13,38 @@ from utils.exceptions import HTTPAPIError
 from tornado_letv.tornado_basic_auth import require_basic_auth
 
 
-class CollectServerResHandler(APIHandler):
+class ServerResHandler(APIHandler):
+
     _server_res_opers = Server_Res_Opers()
-    
     _server_opers = Server_Opers()
-    
+
+
+class CollectServerResHandler(ServerResHandler):
     # eg. curl http://localhost:8888/server/resource
-    @asynchronous
     def get(self):
         server_res = self._server_res_opers.retrieve_host_stat()
         self.finish(server_res)
+
+
+class GatherServerCpuacctHandler(ServerResHandler):
+
+    def get(self):
+        cpu_info=self._server_res_opers.cpu_info()
+        self.finish({"cpu":cpu_info})
+
+
+class GatherServerMemoryHandler(ServerResHandler):
+
+    def get(self):
+        mem_res=self._server_res_opers.memory_stat()
+        self.finish({"memory":mem_res})
+
+
+class GatherServerDiskHandler(ServerResHandler):
+
+    def get(self):
+        server_disk=self._server_res_opers.disk_stat()
+        self.finish({"disk":server_disk})
 
 
 @require_basic_auth
