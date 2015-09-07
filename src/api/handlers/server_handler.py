@@ -7,6 +7,7 @@ import logging
 
 from tornado.web import asynchronous
 from base import APIHandler
+from container.containerOpers import Container_Opers
 from server.serverOpers import Server_Opers
 from resource_letv.serverResourceOpers import Server_Res_Opers
 from utils.exceptions import HTTPAPIError
@@ -53,7 +54,7 @@ class GatherServerContainersDiskLoadHandler(APIHandler):
     
     """
     
-    server_opers = Server_Opers()
+    server_opers = Container_Opers()
     
     # eg. curl --user root:root -d "containerNameList=d-mcl-4_zabbix2-n-2" http://localhost:8888/server/containers/disk
     @asynchronous

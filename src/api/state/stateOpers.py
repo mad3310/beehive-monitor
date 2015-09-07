@@ -13,6 +13,8 @@ from docker_letv.dockerOpers import Docker_Opers
 from container.container_model import Container_Model
 from tornado.options import options
 from utils.exceptions import UserVisiableException
+from deamon.containerResourceManager import get_network_io
+from deamon.containerResourceManager import get_disk_iops
 
 
 class StateOpers(object):
@@ -122,17 +124,10 @@ class StateOpers(object):
         return cpuacct_stat_dict
 
     def get_network_io(self):
-        network_io_dict, RX_SUM, TX_SUM = {}, 0, 0
-        ivk_cmd = InvokeCommand()
-        cmd = "sh %s %s" % (options.network_io_sh, self.container_id)
-        content = ivk_cmd._runSysCmd(cmd)[0]
-        RTX_list = re.findall('.*peth0\s+\d+\s+\d+\s+(\d+)\s+\d+\s+\d+\s+\d+\s+(\d+).*', content)
-        for RX, TX in RTX_list:
-            RX_SUM += int(RX)
-            TX_SUM += int(TX)
-        network_io_dict.setdefault('RX', int(RX_SUM/1024/1024))
-        network_io_dict.setdefault('TX', int(TX_SUM/1024/1024))
-        return network_io_dict
+        return get_network_io(self.container_id)
+
+    def get_disk_iops(self):
+        return get_disk_iops(self.container_id)
 
     def get_oom_kill_disable_value(self): 
         value = self.get_file_value(self.under_oom_path)

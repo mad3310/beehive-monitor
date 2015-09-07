@@ -13,17 +13,24 @@ from status.status_enum import Status
 from state.stateOpers import StateOpers
 
 
-class GatherContainerMemeoyHandler(APIHandler):
-    
-    container_opers = Container_Opers()
-    
-    def get(self, container_name):
+class BaseContainerHandler(APIHandler):
 
+    container_opers = Container_Opers()
+
+    def exists(self,container_name):
         exists = self.container_opers.check_container_exists(container_name)
         if not exists:
             massage = {}
             massage.setdefault("message", "container %s not exists" % container_name)
             self.finish(massage)
+        return exists
+
+
+class GatherContainerMemeoyHandler(BaseContainerHandler):
+
+    def get(self, container_name):
+
+        if not self.exists(container_name):
             return
 
         result = {}
@@ -37,7 +44,7 @@ class GatherContainerMemeoyHandler(APIHandler):
         self.finish(result)
 
 
-class GatherContainerCpuacctHandler(APIHandler):
+class GatherContainerCpuacctHandler(BaseContainerHandler):
     
     container_opers = Container_Opers()
     
@@ -62,17 +69,10 @@ class GatherContainerCpuacctHandler(APIHandler):
         self.finish(result)
 
 
-class GatherContainerNetworkioHandler(APIHandler):
-    
-    container_opers = Container_Opers()
-    
-    def get(self, container_name):
+class GatherContainerNetworkioHandler(BaseContainerHandler):
 
-        exists = self.container_opers.check_container_exists(container_name)
-        if not exists:
-            massage = {}
-            massage.setdefault("message", "container %s not exists" % container_name)
-            self.finish(massage)
+    def get(self, container_name):
+        if not self.exists(container_name):
             return
 
         result = {}
@@ -86,12 +86,25 @@ class GatherContainerNetworkioHandler(APIHandler):
         self.finish(result)
 
 
-class GatherContainerIopsHandler(APIHandler):
-    pass
+class GatherContainerIopsHandler(BaseContainerHandler):
+
+    def get(self, container_name):
+        if not self.exists(container_name):
+            return
+
+        result = {}
+        op = StateOpers(container_name)
+        disk_iops = op.get_disk_iops()
+        current_time = get_current_time()
+
+        result.setdefault('diskiops', disk_iops)
+        result.setdefault('time', current_time)
+        result.setdefault('containerName', container_name)
+        self.finish(result)
 
 
 @require_basic_auth
-class CheckContainerStatusHandler(APIHandler):
+class CheckContainerStatusHandler(BaseContainerHandler):
     '''
     classdocs
     '''

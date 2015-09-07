@@ -34,4 +34,5 @@ define("alarm_serious", default="tel:sms:email", help="alarm level is serious")
 define("alarm_general", default="sms:email", help="alarm level is general")
 define("alarm_nothing", default="nothing", help="no alarm")
 
+define("disk_number_sh", default=join(base_dir, "shell", "disk_number.sh"), help="get disk number script")
 define("network_io_sh", default=join(base_dir, "shell", "network_io.sh"), help="get network io script")
