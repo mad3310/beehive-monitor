@@ -2,6 +2,7 @@
 
 /.pydevproject
 *.pyo
+*.pyc
 
 /.settings
 
