@@ -23,9 +23,9 @@ class Server_Opers(object):
     '''
     classdocs
     '''
-        
+
     server_res_opers = Server_Res_Opers()
-    
+
     def update(self):
         host_ip = getHostIp()
         server_update_action = ServerUpdateAction(host_ip)
@@ -58,8 +58,8 @@ class ServerUpdateAction(Abstract_Async_Thread):
         host_containers = self._get_containers_from_host()
         zk_containers = self._get_containers_from_zookeeper()
         add, delete, both = self._compare(host_containers, zk_containers)
-        
-        logging.info('delete item: %s' % str(delete) )
+
+        logging.info('delete item: %s' % str(delete))
         for item in add:
             self.update_add_node(item)
         for item in delete:
@@ -68,40 +68,50 @@ class ServerUpdateAction(Abstract_Async_Thread):
             self.update_both_node(item)
 
     def update_both_node(self, container_name):
-        
         '''
             container node info in zookeeper (not status) will not be changed, no need to update.
         '''
         status = {}
 
         server_info = self._get_container_info_as_zk(container_name)
-        zk_con_info = self.container_opers.retrieve_container_node_value_from_containerName(container_name)
+        zk_con_info = self.container_opers.retrieve_container_node_value_from_containerName(
+            container_name)
         if server_info != zk_con_info:
             _type = zk_con_info.get('type')
             is_use_ip = zk_con_info.get('isUseIp')
-            server_info.update({'type':_type, 'isUseIp':is_use_ip})
-            logging.info('update both node zookeeper info, container name :%s' % container_name)
-            self.container_opers.write_container_node_value_by_containerName(container_name, server_info)
-        
-        server_con_stat = self.container_opers.get_container_stat(container_name)
-        zk_con_stat = self.container_opers.retrieve_container_status_from_containerName(container_name)
+            server_info.update({'type': _type, 'isUseIp': is_use_ip})
+            logging.info(
+                'update both node zookeeper info, container name :%s' % container_name)
+            self.container_opers.write_container_node_value_by_containerName(
+                container_name, server_info)
+
+        server_con_stat = self.container_opers.get_container_stat(
+            container_name)
+        zk_con_stat = self.container_opers.retrieve_container_status_from_containerName(
+            container_name)
         if server_con_stat != zk_con_stat:
             status.setdefault('status',  server_con_stat)
             status.setdefault('message',  '')
-            self.container_opers.write_container_status_by_containerName(container_name, status)
+            self.container_opers.write_container_status_by_containerName(
+                container_name, status)
 
     def update_add_node(self, container_name):
-        logging.info('update add node : %s' % container_name )
+        logging.info('update add node : %s' % container_name)
         create_info = self._get_container_info_as_zk(container_name)
-        self.container_opers.write_container_node_value_by_containerName(container_name, create_info)
-        container_stat = self.container_opers.get_container_stat(container_name)
+        self.container_opers.write_container_node_value_by_containerName(
+            container_name, create_info)
+        container_stat = self.container_opers.get_container_stat(
+            container_name)
         status = {'status': container_stat, 'message': ''}
-        self.container_opers.write_container_status_by_containerName(container_name, status)
+        self.container_opers.write_container_status_by_containerName(
+            container_name, status)
 
     def update_del_node(self, container_name):
         status = {'status': Status.destroyed, 'message': ''}
-        logging.info('container :%s are not existed, the infomation remains in zookeeper still' % container_name)
-        self.container_opers.write_container_status_by_containerName(container_name, status)
+        logging.info(
+            'container :%s are not existed, the infomation remains in zookeeper still' % container_name)
+        self.container_opers.write_container_status_by_containerName(
+            container_name, status)
 
     def _get_containers_from_host(self):
         container_name_list = []
@@ -114,17 +124,18 @@ class ServerUpdateAction(Abstract_Async_Thread):
 
     def _get_containers_from_zookeeper(self):
         """if the status container in zookeeper is destroyed, regard this container as not exist.
-        
+
         """
-        container_name_list, container_info= [], {}
-        
+        container_name_list, container_info = [], {}
+
         zkOper = Common_ZkOpers()
 
         clusters = zkOper.retrieve_cluster_list()
         for cluster in clusters:
             container_ip_list = zkOper.retrieve_container_list(cluster)
             for container_ip in container_ip_list:
-                container_info = zkOper.retrieve_container_node_value(cluster, container_ip)
+                container_info = zkOper.retrieve_container_node_value(
+                    cluster, container_ip)
                 host_ip = container_info.get('hostIp')
                 if self.host_ip == host_ip:
                     if container_info.has_key('containerName'):
@@ -138,9 +149,9 @@ class ServerUpdateAction(Abstract_Async_Thread):
         return container_name_list
 
     def _compare(self, host_container_list, zk_container_list):
-        add = list( set(host_container_list) - set(zk_container_list) )
-        delete = list( set(zk_container_list) - set(host_container_list) )
-        both = list( set(host_container_list) & set( zk_container_list) )
+        add = list(set(host_container_list) - set(zk_container_list))
+        delete = list(set(zk_container_list) - set(host_container_list))
+        both = list(set(host_container_list) & set(zk_container_list))
         return add, delete, both
 
     def _get_container_info_as_zk(self, container_name):
@@ -154,4 +165,3 @@ class ServerUpdateAction(Abstract_Async_Thread):
         create_info.setdefault('hostIp', self.host_ip)
         create_info.setdefault('containerName', container_name)
         return create_info
-

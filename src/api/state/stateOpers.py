@@ -8,17 +8,15 @@ import commands
 import re
 import logging
 
-from utils.invokeCommand import InvokeCommand
 from docker_letv.dockerOpers import Docker_Opers
 from container.container_model import Container_Model
-from tornado.options import options
 from utils.exceptions import UserVisiableException
 from deamon.containerResourceManager import get_network_io
 from deamon.containerResourceManager import get_disk_iops
 
 
 class StateOpers(object):
-    
+
     docker_opers = Docker_Opers()
 
     def __init__(self, container_name):
@@ -75,7 +73,7 @@ class StateOpers(object):
     def get_con_limit_memsw(self):
         return float(self.get_file_value(self.limit_memsw_path))
 
-    def get_under_oom_value(self): 
+    def get_under_oom_value(self):
         value = self.get_file_value(self.under_oom_path)
         under_oom_value = re.findall('.*under_oom (\d)$', value)[0]
         return int(under_oom_value)
@@ -129,14 +127,16 @@ class StateOpers(object):
     def get_disk_iops(self):
         return get_disk_iops(self.container_id)
 
-    def get_oom_kill_disable_value(self): 
+    def get_oom_kill_disable_value(self):
         value = self.get_file_value(self.under_oom_path)
-        under_oom_value = re.findall('oom_kill_disable (\d)\\nunder_oom.*', value)[0]
+        under_oom_value = re.findall(
+            'oom_kill_disable (\d)\\nunder_oom.*', value)[0]
         return int(under_oom_value)
 
     def _change_container_under_oom(self, switch_value):
         if not os.path.exists(self.under_oom_path):
-            logging.error(' container: %s under oom path not exist' % self.container_name)
+            logging.error(' container: %s under oom path not exist' %
+                          self.container_name)
             return
         cmd = 'echo %s > %s' % (switch_value, self.under_oom_path)
         commands.getoutput(cmd)
@@ -153,9 +153,9 @@ class StateOpers(object):
         mem_load_rate, mem_load_dict = 0, {}
         used_mem = self.get_con_used_mem()
         limit_mem = self.get_con_limit_mem()
-        
+
         if used_mem and limit_mem:
-            mem_load_rate =  used_mem / limit_mem
+            mem_load_rate = used_mem / limit_mem
             mem_load_dict.setdefault('used_mem', used_mem)
             mem_load_dict.setdefault('limit_mem', limit_mem)
             mem_load_dict.setdefault('mem_load_rate', mem_load_rate)
@@ -165,13 +165,13 @@ class StateOpers(object):
         memsw_load_rate, memsw_load_dict = 0, {}
         used_memsw = self.get_con_used_memsw()
         limit_memsw = self.get_con_limit_memsw()
-        
+
         if used_memsw and limit_memsw:
-            memsw_load_rate =  used_memsw / limit_memsw
+            memsw_load_rate = used_memsw / limit_memsw
             memsw_load_dict.setdefault('used_memsw', used_memsw)
             memsw_load_dict.setdefault('limit_memsw', limit_memsw)
             memsw_load_dict.setdefault('memsw_load_rate', memsw_load_rate)
-        return memsw_load_dict    
+        return memsw_load_dict
 
     def get_root_mnt_size(self):
         return self.get_dir_size(self.root_mnt_path)
@@ -197,16 +197,18 @@ class StateOpers(object):
 
     def __extend_memsw(self, times):
         memsw_value = self.get_con_limit_memsw()
-        extend_value = int(memsw_value)*int(times)
+        extend_value = int(memsw_value) * int(times)
         if not self.echo_value_to_file(extend_value, self.limit_memsw_path):
-            raise UserVisiableException('extend container: %s memroy swap faild, please check!' % self.container_name)
+            raise UserVisiableException(
+                'extend container: %s memroy swap faild, please check!' % self.container_name)
         return extend_value
 
     def __extend_mem(self, times):
         mem_value = self.get_con_limit_mem()
-        extend_value = int(mem_value)*int(times)
+        extend_value = int(mem_value) * int(times)
         if not self.echo_value_to_file(extend_value, self.limit_mem_path):
-            raise UserVisiableException('extend container: %s memory faild, please check!' % self.container_name)
+            raise UserVisiableException(
+                'extend container: %s memory faild, please check!' % self.container_name)
         return extend_value
 
     def extend_memory(self, times):
@@ -216,10 +218,12 @@ class StateOpers(object):
 
     def set_cpushares(self, cpushares="1024"):
         if not self.echo_value_to_file(cpushares, self.cpushares_path):
-            raise UserVisiableException('set container :%s cpu.shares value:% failed' % (self.container_name, cpushares))
+            raise UserVisiableException('set container :%s cpu.shares value:% failed' % (
+                self.container_name, cpushares))
         return self.get_cpushares_value()
 
     def set_cpuset(self, cpus):
         if not self.echo_value_to_file(cpus, self.cpuset_path):
-            raise UserVisiableException('set container :%s cpus value:%s failed' % (self.container_name, cpus))
+            raise UserVisiableException(
+                'set container :%s cpus value:%s failed' % (self.container_name, cpus))
         return self.get_cpuset_value()

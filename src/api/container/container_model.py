@@ -15,12 +15,11 @@ class Container_Model(object):
     classdocs
     '''
 
-
     def __init__(self, inspect={}):
         '''
         Constructor
         '''
-        
+
         self.inspect = inspect
 
     @property
@@ -180,6 +179,7 @@ class Container_Model(object):
     """
         ip supplied when container created
     """
+
     def ip(self):
         Env = self.inspect.get('Config').get('Env')
         for item in Env:
@@ -189,11 +189,12 @@ class Container_Model(object):
     """
         ip default when container created
     """
+
     def default_container_ip(self):
         return self.inspect.get('NetworkSettings').get('IPAddress')
-        
+
     def gateway(self):
-        
+
         Env = self.inspect.get('Config').get('Env')
         for item in Env:
             if item.startswith('GATEWAY'):
@@ -221,12 +222,12 @@ class Container_Model(object):
 
     def id(self):
         return self.inspect.get('Id')
-    
+
     def inspect_port_bindings(self):
         '''
             get the format webportal need
         '''
-        
+
         result = []
         _port_bindings = self.inspect.get('HostConfig').get('PortBindings')
         for con_port_protocol, host_port_ip in _port_bindings.items():
@@ -240,30 +241,31 @@ class Container_Model(object):
                 _info.setdefault('containerPort', port)
                 _info.setdefault('protocol', protocol)
                 _info.setdefault('hostPort', host_port)
-                
+
                 result.append(_info)
         return result
-
-
 
     def create_info(self, container_node_value):
         create_info = {}
         if isinstance(container_node_value, dict):
             self.inspect = container_node_value.get('inspect')
             isUseIp = container_node_value.get('isUseIp')
-            create_info.setdefault('hostIp', container_node_value.get('hostIp') )
-            create_info.setdefault('type', container_node_value.get('type') )
+            create_info.setdefault(
+                'hostIp', container_node_value.get('hostIp'))
+            create_info.setdefault('type', container_node_value.get('type'))
             container_name = self.name()
-            create_info.setdefault('containerClusterName', self.cluster(container_name) )
-            create_info.setdefault('zookeeperId', self.zookeeper_id() )
-            create_info.setdefault('gateAddr', self.gateway() )
-            create_info.setdefault('netMask', self.netmask() )
-            create_info.setdefault('mountDir', str(self.inspect_volumes()) )
-            create_info.setdefault('containerName', self.name() )
+            create_info.setdefault(
+                'containerClusterName', self.cluster(container_name))
+            create_info.setdefault('zookeeperId', self.zookeeper_id())
+            create_info.setdefault('gateAddr', self.gateway())
+            create_info.setdefault('netMask', self.netmask())
+            create_info.setdefault('mountDir', str(self.inspect_volumes()))
+            create_info.setdefault('containerName', self.name())
             if isUseIp:
-                create_info.setdefault('ipAddr', self.ip() )
+                create_info.setdefault('ipAddr', self.ip())
             else:
-                create_info.setdefault('port_bindings', self.inspect_port_bindings())
+                create_info.setdefault(
+                    'port_bindings', self.inspect_port_bindings())
                 create_info.setdefault('ipAddr', self.default_container_ip())
         return create_info
 
@@ -278,8 +280,9 @@ class Container_Model(object):
         '''
             need image name contain container component type
         '''
-        
-        type_list = ['logstash', 'nginx', 'jetty', 'mcluster', 'gbalancer', 'gbalancerCluster', 'cbase']
+
+        type_list = ['logstash', 'nginx', 'jetty', 'mcluster',
+                     'gbalancer', 'gbalancerCluster', 'cbase']
         _image = self.inspect_image()
         for _type in type_list:
             if _type in _image:

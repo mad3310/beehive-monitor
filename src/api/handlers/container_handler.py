@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
 
-import logging
-
 from base import APIHandler
 from utils import get_current_time
 from tornado_letv.tornado_basic_auth import require_basic_auth
@@ -15,26 +13,30 @@ class BaseContainerHandler(APIHandler):
 
     container_opers = Container_Opers()
 
-    def exists(self,container_name):
+    def exists(self, container_name):
         exists = self.container_opers.check_container_exists(container_name)
         if not exists:
             massage = {}
-            massage.setdefault("message", "container %s not exists" % container_name)
+            massage.setdefault(
+                "message", "container %s not exists" % container_name)
             self.finish(massage)
         return exists
 
-    def get_container_resource(self,container_name,resource_type):
-        zk_opers=Requests_ZkOpers()
+    def get_container_resource(self, container_name, resource_type):
+        zk_opers = Requests_ZkOpers()
 
-        result={}
-        cluster_name=get_containerClusterName_from_containerName(container_name)
-        node_name=self.container_opers.get_container_node_from_container_name(cluster_name,container_name)
-        resource_value=zk_opers.retrieve_container_resource(cluster_name,node_name,resource_type)
-        current_time=get_current_time()
+        result = {}
+        cluster_name = get_containerClusterName_from_containerName(
+            container_name)
+        node_name = self.container_opers.get_container_node_from_container_name(
+            cluster_name, container_name)
+        resource_value = zk_opers.retrieve_container_resource(
+            cluster_name, node_name, resource_type)
+        current_time = get_current_time()
 
-        result.setdefault(resource_type,resource_value)
-        result.setdefault('time',current_time)
-        result.setdefault('containerName',container_name)
+        result.setdefault(resource_type, resource_value)
+        result.setdefault('time', current_time)
+        result.setdefault('containerName', container_name)
         return result
 
 
@@ -45,19 +47,19 @@ class GatherContainerMemeoyHandler(BaseContainerHandler):
         if not self.exists(container_name):
             return
 
-        result=self.get_container_resource(container_name,'memory')
+        result = self.get_container_resource(container_name, 'memory')
         self.finish(result)
 
 
 class GatherContainerCpuacctHandler(BaseContainerHandler):
-    
+
     container_opers = Container_Opers()
 
     def get(self, container_name):
         if not self.exists(container_name):
             return
 
-        result = self.get_container_resource(container_name,'cpuacct')
+        result = self.get_container_resource(container_name, 'cpuacct')
         self.finish(result)
 
 
@@ -67,7 +69,7 @@ class GatherContainerNetworkioHandler(BaseContainerHandler):
         if not self.exists(container_name):
             return
 
-        result=self.get_container_resource(container_name,'networkio')
+        result = self.get_container_resource(container_name, 'networkio')
         self.finish(result)
 
 
@@ -77,7 +79,7 @@ class GatherContainerDiskIopsHandler(BaseContainerHandler):
         if not self.exists(container_name):
             return
 
-        result=self.get_container_resource(container_name,'diskiops')
+        result = self.get_container_resource(container_name, 'diskiops')
         self.finish(result)
 
 
@@ -87,7 +89,7 @@ class GatherContainerDiskLoadHandler(BaseContainerHandler):
         if not self.exists(container_name):
             return
 
-        result=self.get_container_resource(container_name,'diskload')
+        result = self.get_container_resource(container_name, 'diskload')
         self.finish(result)
 
 

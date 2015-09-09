@@ -12,17 +12,18 @@ from resource_letv.containerResourceOpers import ContainerMemoryHandler
 
 class ContainerMemoryWorker(Abstract_Async_Thread):
 
-    def __init__(self,timeout=5):
-        super(ContainerMemoryWorker,self).__init__()
-        self.timeout=timeout
-        self.memory_handler=ContainerMemoryHandler()
+    def __init__(self, timeout=5):
+        super(ContainerMemoryWorker, self).__init__()
+        self.timeout = timeout
+        self.memory_handler = ContainerMemoryHandler()
 
     def run(self):
         zkOper = Scheduler_ZkOpers()
         try:
             isLock, lock = zkOper.lock_container_memory()
         except LockTimeout:
-            logging.info("a thread is running the monitor async, give up this oper on this machine!")
+            logging.info(
+                "a thread is running the monitor async, give up this oper on this machine!")
             return
 
         if not isLock:

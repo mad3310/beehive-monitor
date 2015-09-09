@@ -7,23 +7,23 @@ import logging
 from kazoo.exceptions import LockTimeout
 
 from zk.zkOpers import Scheduler_ZkOpers
-from common.abstractAsyncThread import  Abstract_Async_Thread
-from resource_letv.serverResourceOpers import ServerCPUHandler,ServerMemoryHandler,ServerDiskHandler
+from common.abstractAsyncThread import Abstract_Async_Thread
+from resource_letv.serverResourceOpers import ServerCPUHandler, ServerMemoryHandler, ServerDiskHandler
 
 
 class ServerResourceWorker(Abstract_Async_Thread):
 
-    def __init__(self,timeout=2):
-        super(ServerResourceWorker,self).__init__()
-        self.timeout=timeout
-        self.cpu_handler=ServerCPUHandler()
-        self.memory_handler=ServerMemoryHandler()
-        self.disk_handler=ServerDiskHandler()
+    def __init__(self, timeout=2):
+        super(ServerResourceWorker, self).__init__()
+        self.timeout = timeout
+        self.cpu_handler = ServerCPUHandler()
+        self.memory_handler = ServerMemoryHandler()
+        self.disk_handler = ServerDiskHandler()
 
     def run(self):
-        zk_op=Scheduler_ZkOpers()
+        zk_op = Scheduler_ZkOpers()
         try:
-            is_lock,lock=zk_op.lock_server_resource()
+            is_lock, lock = zk_op.lock_server_resource()
         except LockTimeout:
             logging.info("get zookeeper lock time out")
             return
@@ -33,13 +33,14 @@ class ServerResourceWorker(Abstract_Async_Thread):
             return
 
         try:
-            start=time.time()
+            start = time.time()
             self._write_server_resource()
             while True:
-                end=time.time()
-                duration=end-start
-                if duration > (self.timeout-1):
-                    logging.info('release the log, get lock time: %s, release time: %s,\n total time : %s' % (str(start), str(end), int(duration)))
+                end = time.time()
+                duration = end - start
+                if duration > (self.timeout - 1):
+                    logging.info('release the log, get lock time: %s, release time: %s,\n total time : %s' % (
+                        str(start), str(end), int(duration)))
                     break
             time.sleep(1)
         except Exception:

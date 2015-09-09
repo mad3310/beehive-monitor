@@ -26,7 +26,8 @@ __all__ = ("send_email", "EmailAddress")
 # borrow email re pattern from django
 _email_re = re.compile(
     r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*"  # dot-atom
-    r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-011\013\014\016-\177])*"'  # quoted-string
+    # quoted-string
+    r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-011\013\014\016-\177])*"'
     r')@(?:[A-Z0-9]+(?:-*[A-Z0-9]+)*\.)+[A-Z]{2,6}$', re.IGNORECASE)  # domain
 
 
@@ -37,7 +38,7 @@ def send_email(to, subject, body, html=None, attachments=[]):
     plain text and HTML parts. Attachments can be added by providing as a
     list of (filename, data) tuples.
     """
-    
+
     fr = options.smtp_from_address
     # convert EmailAddress to pure string
     if isinstance(fr, EmailAddress):
@@ -52,8 +53,8 @@ def send_email(to, subject, body, html=None, attachments=[]):
             mtlist.append(t)
     mailto = []
     for i in range(len(mtlist)):
-        if re.match('\S*\s*<\s*\S+@\S+\.\S+>', mtlist[i]): mailto.append(mtlist[i])
-
+        if re.match('\S*\s*<\s*\S+@\S+\.\S+>', mtlist[i]):
+            mailto.append(mtlist[i])
 
     if html:
         # Multipart HTML and plain text
@@ -72,7 +73,7 @@ def send_email(to, subject, body, html=None, attachments=[]):
             part.set_payload(data)
             encoders.encode_base64(part)
             part.add_header("Content-Disposition", "attachment",
-                filename=filename)
+                            filename=filename)
             message.attach(part)
 
     message["Date"] = formatdate(time.time())
@@ -84,6 +85,7 @@ def send_email(to, subject, body, html=None, attachments=[]):
 
 
 class EmailAddress(object):
+
     def __init__(self, addr, name=""):
         assert _email_re.match(addr), "Email address(%s) is invalid." % addr
 
@@ -98,6 +100,7 @@ class EmailAddress(object):
 
 
 class _SMTPSession(object):
+
     def __init__(self, host, port, user='', password='', duration=30, tls=False):
         self.host = host
         self.port = port
@@ -114,7 +117,8 @@ class _SMTPSession(object):
             self.renew()
 
         try:
-            logging.info('Send email from %s to %s message:%s' % (fr, to, str(message)))
+            logging.info('Send email from %s to %s message:%s' %
+                         (fr, to, str(message)))
             self.session.sendmail(fr, to, message)
         except Exception, e:
             err = "Send email from %s to %s failed!\n Exception: %s!" \

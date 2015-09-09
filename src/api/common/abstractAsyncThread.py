@@ -10,14 +10,14 @@ from tornado.options import options
 
 
 class Abstract_Async_Thread(threading.Thread):
-    
+
     threading_exception_queue = Threading_Exception_Queue()
-    
+
     confOpers = ConfigFileOpers()
-    
+
     def __init__(self):
         threading.Thread.__init__(self)
-        
+
     def _send_email(self, data_node_ip, text):
         try:
             # send email
@@ -29,9 +29,9 @@ class Abstract_Async_Thread(threading.Thread):
 
             body = "[%s] %s" % (data_node_ip, text)
             body += "\n" + version_str[0] + "\nip:" + host_ip
-            
+
 #            email_from = "%s <noreply@%s>" % (options.sitename, options.domain)
             if options.send_email_switch:
                 send_email(options.admins, subject, body)
-        except Exception,e:
+        except Exception, e:
             logging.error("send email process occurs error", e)
