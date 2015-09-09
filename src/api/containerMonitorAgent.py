@@ -12,9 +12,10 @@ import logging
 import logging.config
 
 from tornado.options import options
-from appdefine import appDefine
 
+from appdefine import appDefine
 from check_sync import CheckSync
+from scheduler.scheduler_tasks.schedulerOpers import SchedulerOpers
 
 
 class Application(tornado.web.Application):
@@ -36,7 +37,8 @@ def main():
     tornado.options.parse_command_line()
     http_server = tornado.httpserver.HTTPServer(Application())
     http_server.listen(options.port)
-    
+
+    SchedulerOpers()
     tornado.ioloop.IOLoop.instance().start()
 
 

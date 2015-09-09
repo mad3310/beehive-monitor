@@ -268,8 +268,35 @@ class ZkOpers(object):
         self.zk.ensure_path(path)
         self.DEFAULT_RETRY_POLICY(self.zk.set, path, str(monitor_value))#version need to write
 
+    '''
+    ***************************************resource********************************************
+    '''
 
+    def retrieve_server_resource(self, host_ip,resource_type):
+        cluster_uuid=self.getClusterUUID()
+        path=self.rootPath+"/"+cluster_uuid+"/dataNode/"+host_ip+"/resource/"+resource_type
+        resultValue = self._retrieveSpecialPathProp(path)
+        return resultValue
 
+    def retrieve_container_resource(self, cluster_name,container_node,resource_type):
+        cluster_uuid=self.getClusterUUID()
+        path=self.rootPath+"/"+cluster_uuid+"/container/cluster/"+cluster_name+"/"+container_node+"/resource/"+resource_type
+        resultValue = self._retrieveSpecialPathProp(path)
+        return resultValue
+
+    def write_server_resource(self,host_ip,resource_type,resource_value):
+        cluster_uuid=self.getClusterUUID()
+        path=self.rootPath+"/"+cluster_uuid+"/dataNode/"+host_ip+"/resource/"+resource_type
+        logging.debug("server resource status:"+path)
+        self.zk.ensure_path(path)
+        self.DEFAULT_RETRY_POLICY(self.zk.set,path,str(resource_value))
+
+    def write_container_resource(self,cluster_name,container_node,resource_type,resource_value):
+        cluster_uuid=self.getClusterUUID()
+        path=self.rootPath+"/"+cluster_uuid+"/container/cluster/"+cluster_name+"/"+container_node+"/resource/"+resource_type
+        logging.debug("container resource status:"+path)
+        self.zk.ensure_path(path)
+        self.DEFAULT_RETRY_POLICY(self.zk.set,path,str(resource_value))
     
     '''
     ***************************************config********************************************
@@ -329,11 +356,6 @@ class ZkOpers(object):
         clusterUUID = self.getClusterUUID()
         path = self.rootPath + '/' +clusterUUID + '/ipPool'
         return self._return_children_to_list(path)
-
-
-
-
-   
             
     '''
     **********************************************Port Pool***********************************
@@ -415,6 +437,47 @@ class ZkOpers(object):
     def unLock_check_port_usable_action(self, lock):
         self._unLock_base_action(lock)
 
+    def lock_server_resource(self):
+        lock_name = "server_resource"
+        return self._lock_base_action(lock_name)
+
+    def unLock_server_resource(self, lock):
+        self._unLock_base_action(lock)
+
+    def lock_container_cpuacct(self):
+        lock_name = "container/cpuacct"
+        return self._lock_base_action(lock_name)
+
+    def unLock_container_cpuacct(self, lock):
+        self._unLock_base_action(lock)
+
+    def lock_container_memory(self):
+        lock_name = "container/memory"
+        return self._lock_base_action(lock_name)
+
+    def unLock_container_memory(self, lock):
+        self._unLock_base_action(lock)
+
+    def lock_container_diskiops(self):
+        lock_name = "container/diskiops"
+        return self._lock_base_action(lock_name)
+
+    def unLock_container_diskiops(self, lock):
+        self._unLock_base_action(lock)
+
+    def lock_container_diskload(self):
+        lock_name = "container/diskload"
+        return self._lock_base_action(lock_name)
+
+    def unLock_container_diskload(self, lock):
+        self._unLock_base_action(lock)
+
+    def lock_container_networkio(self):
+        lock_name = "container/networkio"
+        return self._lock_base_action(lock_name)
+
+    def unLock_container_networkio(self, lock):
+        self._unLock_base_action(lock)
     '''
     *********************************************Base method*******************************************
     '''

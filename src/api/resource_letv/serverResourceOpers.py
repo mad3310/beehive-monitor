@@ -15,7 +15,8 @@ from utils.invokeCommand import InvokeCommand
 from utils import getHostIp
 from docker_letv.dockerOpers import Docker_Opers
 from container.containerOpers import Container_Opers
-from zk.zkOpers import Common_ZkOpers
+from zk.zkOpers import Common_ZkOpers,Scheduler_ZkOpers
+from utils import getHostIp
 
 
 class Server_Res_Opers():
@@ -619,7 +620,7 @@ class Server_Res_Opers():
             name = line.split(':')[0].rstrip()  
             var = line.split(':')[1].rstrip()
             cpuinfo[name] = var 
-        self._logger.info("cpu information :" + str(cpu))
+        #self._logger.info("cpu information :" + str(cpu))
         return cpu
     
     def _read_network_statics(self):
@@ -734,3 +735,37 @@ class Server_Res_Opers():
         avg_load = (n2 - n1) / 1024
         self._logger.info("network load per second at this time:" + str(avg_load))
         return avg_load
+
+
+class ServerResourceHandler(object):
+
+    ip=getHostIp()
+    server_res_opers = Server_Res_Opers()
+
+    def gather(self):
+        raise NotImplementedError("the gather method must be implemented")
+
+    def write_to_zookeeper(self,tp,value):
+        zk_op=Scheduler_ZkOpers()
+        zk_op.write_server_resource(self.ip,tp,value)
+
+
+class ServerCPUHandler(ServerResourceHandler):
+
+    def gather(self):
+        cpu_info=self.server_res_opers.cpu_info()
+        self.write_to_zookeeper("cpu",cpu_info)
+
+
+class ServerMemoryHandler(ServerResourceHandler):
+
+    def gather(self):
+        memory_stat=self.server_res_opers.memory_stat()
+        self.write_to_zookeeper("memory",memory_stat)
+
+
+class ServerDiskHandler(ServerResourceHandler):
+
+    def gather(self):
+        disk_stat=self.server_res_opers.disk_stat()
+        self.write_to_zookeeper("disk",disk_stat)

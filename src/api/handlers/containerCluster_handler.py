@@ -93,7 +93,6 @@ class CheckContainerClusterStatusHandler(APIHandler):
         self.finish(result)
 
 
-
 @require_basic_auth
 class CheckClusterSyncHandler(APIHandler):
     

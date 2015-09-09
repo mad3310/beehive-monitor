@@ -26,8 +26,6 @@ class ContainerResourceManager(object):
         for container_id in self.container_ids:
             self.add_container_resource(container_id)
 
-        self.init_dev_number()
-
     def add_container_resource(self,container_id):
         self.network_ios[container_id]=NetworkIO()
         self.disk_ios[container_id]=DiskIO()
@@ -38,6 +36,7 @@ class ContainerResourceManager(object):
         self.dev_number=ivk_cmd._runSysCmd(cmd)[0]
 
     def start(self):
+        self.init_dev_number()
         for _id in self.container_ids:
             self.start_container(_id)
 
