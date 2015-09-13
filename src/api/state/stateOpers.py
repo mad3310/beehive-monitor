@@ -11,8 +11,6 @@ import logging
 from docker_letv.dockerOpers import Docker_Opers
 from container.container_model import Container_Model
 from utils.exceptions import UserVisiableException
-from deamon.containerResourceManager import get_network_io
-from deamon.containerResourceManager import get_disk_iops
 
 
 class StateOpers(object):
@@ -120,12 +118,6 @@ class StateOpers(object):
                 system = item.split(' ')[1]
                 cpuacct_stat_dict.setdefault('system', system)
         return cpuacct_stat_dict
-
-    def get_network_io(self):
-        return get_network_io(self.container_id)
-
-    def get_disk_iops(self):
-        return get_disk_iops(self.container_id)
 
     def get_oom_kill_disable_value(self):
         value = self.get_file_value(self.under_oom_path)

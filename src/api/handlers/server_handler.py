@@ -11,11 +11,11 @@ from zk.zkOpers import Requests_ZkOpers
 class ServerResHandler(APIHandler):
 
     server_opers = Server_Opers()
-    zk_opers = Requests_ZkOpers()
 
     def get_server_resource(self, host_ip, resource_type):
+        zk_opers = Requests_ZkOpers()
         result = {}
-        resource_value = self.zk_opers.retrieve_server_resource(
+        resource_value = zk_opers.retrieve_server_resource(
             host_ip, resource_type)
         result.setdefault(resource_type, resource_value)
         return result

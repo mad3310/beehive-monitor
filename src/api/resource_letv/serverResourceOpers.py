@@ -17,6 +17,7 @@ from docker_letv.dockerOpers import Docker_Opers
 from container.containerOpers import Container_Opers
 from zk.zkOpers import Common_ZkOpers, Scheduler_ZkOpers
 from utils import getHostIp
+from daemon.serverResource import CPURatio
 
 
 class Server_Res_Opers():
@@ -30,6 +31,7 @@ class Server_Res_Opers():
 
     docker_opers = Docker_Opers()
     container_opers = Container_Opers()
+    _server_cpu_ratio = CPURatio()
 
     def __init__(self, container_name=""):
         self.name = container_name
@@ -633,6 +635,13 @@ class Server_Res_Opers():
         #self._logger.info("cpu information :" + str(cpu))
         return cpu
 
+    def cpu_ratio(self):
+        return self._server_cpu_ratio.get_result()
+
+    @property
+    def server_cpu_ratio(self):
+        return self._server_cpu_ratio
+
     def _read_network_statics(self):
         """Read the current network statics from /proc/net/dev """
         try:
@@ -766,8 +775,8 @@ class ServerResourceHandler(object):
 class ServerCPUHandler(ServerResourceHandler):
 
     def gather(self):
-        cpu_info = self.server_res_opers.cpu_info()
-        self.write_to_zookeeper("cpu", cpu_info)
+        cpu_ratio = self.server_res_opers.cpu_ratio()
+        self.write_to_zookeeper("cpu", cpu_ratio)
 
 
 class ServerMemoryHandler(ServerResourceHandler):
