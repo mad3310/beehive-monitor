@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
 
-from tornado.web import RequestHandler,HTTPError
+from tornado.web import RequestHandler, HTTPError
 from tornado import escape
 from tornado.options import options
 
@@ -13,8 +13,9 @@ from utils import getHostIp
 import logging
 import traceback
 
+
 class BaseHandler(RequestHandler):
-    
+
     logger = logging.getLogger('root')
 
     def get_all_arguments(self):
@@ -23,8 +24,10 @@ class BaseHandler(RequestHandler):
         for key in args:
             request_param.setdefault(key, args[key][0])
         return request_param
-    
+
+
 class APIHandler(BaseHandler):
+
     def finish(self, chunk=None, notification=None):
         if chunk is None:
             chunk = {}
@@ -68,7 +71,8 @@ class APIHandler(BaseHandler):
             else:
                 e = HTTPAPIError(500)
 
-            exception = "".join([ln for ln in traceback.format_exception(*exc_info)])
+            exception = "".join(
+                [ln for ln in traceback.format_exception(*exc_info)])
 
             if status_code == 500 and not debug:
                 logging.error(e)
@@ -92,14 +96,14 @@ class APIHandler(BaseHandler):
             invokeCommand = InvokeCommand()
             cmd_str = "rpm -qa container-monitor-agent"
             version_str = invokeCommand._runSysCmd(cmd_str)
-            logging.info("version_str :" + str(version_str)) 
+            logging.info("version_str :" + str(version_str))
             # send email
             subject = "[%s]Internal Server Error " % options.sitename
             body = self.render_string("../templates/errors/500_email.html",
                                       exception=exception)
-            
+
             body += "\n" + version_str[0] + "\nip:" + local_ip
-            
+
 #            email_from = "%s <noreply@%s>" % (options.sitename, options.domain)
             if options.send_email_switch:
                 send_email(options.admins, subject, body)
@@ -109,6 +113,7 @@ class APIHandler(BaseHandler):
 
 class ErrorHandler(RequestHandler):
     """Default 404: Not Found handler."""
+
     def prepare(self):
         super(ErrorHandler, self).prepare()
         raise HTTPError(404)
@@ -116,6 +121,7 @@ class ErrorHandler(RequestHandler):
 
 class APIErrorHandler(APIHandler):
     """Default API 404: Not Found handler."""
+
     def prepare(self):
         super(APIErrorHandler, self).prepare()
         raise HTTPAPIError(404)

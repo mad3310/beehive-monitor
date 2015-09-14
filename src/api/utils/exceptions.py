@@ -16,10 +16,12 @@ class HTTPAPIError(HTTPError):
     API server always returns formatted JSON to client even there is
     an internal server error.
     """
+
     def __init__(self, status_code=400, error_detail="", error_type="",
                  notification="", response="", log_message=None, *args):
 
-        super(HTTPAPIError, self).__init__(int(status_code), log_message, *args)
+        super(HTTPAPIError, self).__init__(
+            int(status_code), log_message, *args)
 
         self.error_type = error_type if error_type else \
             _error_types.get(self.status_code, "unknow_error")
@@ -42,34 +44,44 @@ class HTTPAPIError(HTTPError):
             if v:
                 err[name] = v
 
+
 class CommonException(Exception):
+
     def __init__(self, value):
         super(CommonException, self).__init__(
             "Common Exception. Error Message %s " % (value))
         self.value = value
-        
+
     def __str__(self):
         return repr(self.value)
-    
+
+
 class RetryException(Exception):
+
     def __init__(self, value):
         super(RetryException, self).__init__(
             "Retry Exception. Error Message %s " % (value))
         self.value = value
-        
+
     def __str__(self):
         return repr(self.value)
-    
+
+
 class ImageNotFoundError(Exception):
+
     def __init__(self, image, tag):
         super(ImageNotFoundError, self).__init__(
             "Image %s with tag %s not found." % (image, tag))
-        
+
+
 class UserVisiableException(CommonException):
+
     def __init__(self, value):
         super(UserVisiableException, self).__init__(value)
-        
+
+
 class ZKLockException(CommonException):
+
     def __init__(self, value):
         super(ZKLockException, self).__init__(value)
 

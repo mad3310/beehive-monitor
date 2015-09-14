@@ -16,26 +16,27 @@ class Docker_Opers(client):
     classdocs
     '''
     client = client()
-    
+
     def __init__(self):
-        super(Docker_Opers, self).__init__(base_url='unix://var/run/docker.sock')
+        super(Docker_Opers, self).__init__(
+            base_url='unix://var/run/docker.sock')
         self.image_cache = []
         self.log = logging.getLogger(__name__)
 
     def create(self, docker_model):
-        
+
         entry = _get_property_dict(docker_model)
         image = entry['image']
-        
+
         tty = entry['tty'] if 'tty' in entry else True
         stdin_open = entry['stdin_open'] if 'stdin_open' in entry else True
-        
+
         kwargs = {
             'image': image,
             'user': 'root',
             'detach': False,
-            'tty' : tty,
-            'stdin_open':stdin_open,
+            'tty': tty,
+            'stdin_open': stdin_open,
         }
 
         if 'name' in entry:
@@ -64,24 +65,25 @@ class Docker_Opers(client):
 
         if 'ports' in entry:
             kwargs['ports'] = entry['ports']
-            
+
         container = self.client.create_container(**kwargs)
-        
-        #self.docker_start(docker_model)
-        
+
+        # self.docker_start(docker_model)
+
         return container['Id']
 
     def start(self, docker_model):
-        
+
         container = docker_model.name
         entry = _get_property_dict(docker_model)
         privileged = entry['privileged'] if 'privileged' in entry else True
-        network_mode = entry['network_mode'] if 'network_mode' in entry else 'bridge'
-        
+        network_mode = entry[
+            'network_mode'] if 'network_mode' in entry else 'bridge'
+
         kwargs = {
             'container': container,
-            'network_mode':network_mode, 
-            'privileged' : privileged
+            'network_mode': network_mode,
+            'privileged': privileged
         }
 
         if 'binds' in entry:
@@ -114,17 +116,17 @@ class Docker_Opers(client):
         if 'publish_all_ports' in entry:
             kwargs['publish_all_ports'] = entry['publish_all_ports']
 
-        self.client.start(**kwargs);
-       
+        self.client.start(**kwargs)
+
     def stop(self, container, timeout=20):
         self.client.stop(container, timeout)
-    
+
     def kill(self, container, signal='HUP'):
         self.client.kill(container, signal)
-    
+
     def remove_container(self, container, v=True, link=False, force=False):
         self.client.remove_container(container, v, link, force)
-    
+
     def destroy(self, container):
         self.kill(container)
         self.remove_container(container, force=True)
@@ -134,31 +136,33 @@ class Docker_Opers(client):
 
     def containers(self, quiet=False, all=False, trunc=True, latest=False,
                    since=None, before=None, limit=-1, size=False):
-        return self.client.containers(quiet, 
-                                      all, 
-                                      trunc, 
-                                      latest, 
-                                      since, 
-                                      before, 
-                                      limit, 
+        return self.client.containers(quiet,
+                                      all,
+                                      trunc,
+                                      latest,
+                                      since,
+                                      before,
+                                      limit,
                                       size)
-        
+
     def inspect_container(self, container):
         return self.client.inspect_container(container)
-    
+
     '''
     @todo: need test
     '''
+
     def retrieve_containers_ids(self):
         containers_info = self.containers()
         id_list = []
         for container_iter in containers_info:
             id_list.append(container_iter['Id'])
         return id_list
-    
+
     '''
     @todo: need test
     '''
+
     def retrieve_containers_ips(self):
         container_id_list = self.retrieve_containers_ids()
         ip_list = []
@@ -168,12 +172,12 @@ class Docker_Opers(client):
                 if item.startswith("IP="):
                     ip_list.append(item.split("=")[1])
         return ip_list
-    
+
     def image_name_list(self):
         image_list = []
         images = self.client.images()
         for image in images:
-            for k,v in image.items():
+            for k, v in image.items():
                 if k == 'RepoTags':
                     image_list.extend(v)
         return image_list
@@ -203,9 +207,10 @@ class Docker_Opers(client):
         if image in image_name_list:
             logging.info('image exist, no need to pull')
             return True
-        
+
         repository, tag = self.tag(image)
-        pull_result = self.client.pull(repository=repository, tag=tag, stream=True)
+        pull_result = self.client.pull(
+            repository=repository, tag=tag, stream=True)
         for line in pull_result:
             parsed = json.loads(line)
             if 'error' in parsed:
