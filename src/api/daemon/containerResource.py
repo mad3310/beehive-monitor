@@ -50,10 +50,10 @@ class NetworkIO(ContainerResource):
 
     def __init__(self, container_id):
         super(NetworkIO, self).__init__(container_id)
-        self._total_rx = 0  # KB
-        self._total_tx = 0  # KB
-        self._rx = 0  # KB
-        self._tx = 0  # KB
+        self._total_rx = 0
+        self._total_tx = 0
+        self._rx = 0
+        self._tx = 0
 
     def statistic(self):
         RX_SUM, TX_SUM = 0, 0
@@ -61,12 +61,12 @@ class NetworkIO(ContainerResource):
         cmd = "sh %s %s" % (options.network_io_sh, self._container_id)
         content = ivk_cmd._runSysCmd(cmd)[0]
         trx_list = re.findall(
-            '.*peth0\s+\d+\s+\d+\s+(\d+)\s+\d+\s+\d+\s+\d+\s+(\d+).*', content)
+            '.*pbound0\s+\d+\s+\d+\s+(\d+)\s+\d+\s+\d+\s+\d+\s+(\d+).*', content)
         for RX, TX in trx_list:
             RX_SUM += int(RX)
             TX_SUM += int(TX)
-        rx_sum = RX_SUM / 1024
-        tx_sum = TX_SUM / 1024
+        rx_sum = RX_SUM
+        tx_sum = TX_SUM
         if self._total_tx and self._total_rx:
             self._tx = tx_sum - self._total_tx
             self._rx = rx_sum - self._total_rx
@@ -95,10 +95,10 @@ class DiskIO(ContainerResource):
         super(DiskIO, self).__init__(container_id)
         self.file = "/cgroup/blkio/lxc/%s/blkio.throttle.io_service_bytes"
         self.dev_number = self._dev_number()
-        self._read_iops = 0  # KB
-        self._write_iops = 0  # KB
-        self._total_read_bytes = 0  # KB
-        self._total_write_bytes = 0  # KB
+        self._read_iops = 0
+        self._write_iops = 0
+        self._total_read_bytes = 0
+        self._total_write_bytes = 0
 
     @staticmethod
     def _dev_number():
@@ -125,8 +125,8 @@ class DiskIO(ContainerResource):
         else:
             sread = 0
             swrite = 0
-        read = int(sread) / 1024
-        write = int(swrite) / 1024
+        read = int(sread)
+        write = int(swrite)
         if self._total_read_bytes and self._total_write_bytes:
             self._read_iops = read - self._total_read_bytes
             self._write_iops = write - self._total_write_bytes
