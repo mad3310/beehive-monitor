@@ -37,6 +37,10 @@ class Server_Opers(object):
         host_ip = getHostIp()
         zkOper.writeDataNodeServerResource(host_ip, server_res)
 
+    def host_exist(self, host_ip):
+        zk_op = Common_ZkOpers()
+        return zk_op.check_data_node_exist(host_ip)
+
 
 class ServerUpdateAction(Abstract_Async_Thread):
 

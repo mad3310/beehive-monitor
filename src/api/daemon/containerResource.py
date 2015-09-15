@@ -103,7 +103,7 @@ class DiskIO(ContainerResource):
     @staticmethod
     def _dev_number():
         ivk_cmd = InvokeCommand()
-        cmd = "sh %s %s" % (options.disk_number_sh, "/srv")
+        cmd = "sh %s %s" % (options.disk_number_sh, "/srv/docker/vfs")
         return ivk_cmd._runSysCmd(cmd)[0]
 
     @property

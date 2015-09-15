@@ -130,6 +130,13 @@ class ZkOpers(object):
             return True
         return False
 
+    def check_data_node_exist(self, host_ip):
+        clusterUUID = self.getClusterUUID()
+        path = self.rootPath + "/" + clusterUUID + "/dataNode/" + host_ip
+        if self.zk.exists(path):
+            return True
+        return False
+
     def writeDataNodeContainersResource(self, ip_address, resource_type, resource_info):
         _clusterUUID = self.getClusterUUID()
         _path = "%s/%s/dataNode/%s/containersResource/%s" % (
@@ -238,6 +245,14 @@ class ZkOpers(object):
         clusterUUID = self.getClusterUUID()
         path = self.rootPath + "/" + clusterUUID + \
             "/container/cluster/" + containerClusterName
+        if self.zk.exists(path):
+            return True
+        return False
+
+    def check_container_exists(self, cluster_name, container_node):
+        clusterUUID = self.getClusterUUID()
+        path = self.rootPath + "/" + clusterUUID + \
+            "/container/cluster/" + cluster_name + "/" + container_node
         if self.zk.exists(path):
             return True
         return False

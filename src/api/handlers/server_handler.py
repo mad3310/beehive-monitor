@@ -12,6 +12,15 @@ class ServerResHandler(APIHandler):
 
     server_opers = Server_Opers()
 
+    def exists(self, host_ip):
+        exist = self.server_opers.host_exist(host_ip)
+        if not exist:
+            massage = {}
+            massage.setdefault(
+                "message", "host %s not exists" % host_ip)
+            self.finish(massage)
+        return exist
+
     def get_server_resource(self, host_ip, resource_type):
         zk_opers = Requests_ZkOpers()
         result = {}
@@ -34,6 +43,10 @@ class CollectServerResHandler(ServerResHandler):
 class GatherServerCpuacctHandler(ServerResHandler):
 
     def get(self, host_ip):
+
+        if not self.exists(host_ip):
+            return
+
         result = self.get_server_resource(host_ip, 'cpu')
         self.finish(result)
 
@@ -41,6 +54,10 @@ class GatherServerCpuacctHandler(ServerResHandler):
 class GatherServerMemoryHandler(ServerResHandler):
 
     def get(self, host_ip):
+
+        if not self.exists(host_ip):
+            return
+
         result = self.get_server_resource(host_ip, 'memory')
         self.finish(result)
 
@@ -48,5 +65,9 @@ class GatherServerMemoryHandler(ServerResHandler):
 class GatherServerDiskHandler(ServerResHandler):
 
     def get(self, host_ip):
+
+        if not self.exists(host_ip):
+            return
+
         result = self.get_server_resource(host_ip, 'disk')
         self.finish(result)

@@ -27,6 +27,7 @@ from status.status_enum import Status
 from componentProxy.componentManagerValidator import ComponentManagerStatusValidator
 from utils import get_containerClusterName_from_containerName
 from state.stateOpers import StateOpers
+from utils import get_containerClusterName_from_containerName
 
 
 class Container_Opers(Abstract_Container_Opers):
@@ -105,9 +106,12 @@ class Container_Opers(Abstract_Container_Opers):
         return container_name_list
 
     def check_container_exists(self, container_name):
-        container_name_list = self.get_all_containers()
-        return_result = container_name in container_name_list
-        return return_result
+        cluster_name = get_containerClusterName_from_containerName(
+            container_name)
+        container_node = self.get_container_node_from_container_name(
+            cluster_name, container_name)
+        zkOper = Container_ZkOpers()
+        return zkOper.check_container_exists(cluster_name, container_node)
 
     def manager_status_validate(self, component_type, container_name):
         return self.component_manager_status_validator.validate_manager_status_for_container(component_type, container_name)
@@ -182,6 +186,9 @@ class Container_Opers(Abstract_Container_Opers):
         inspect = container_info.get('inspect')
         con = Container_Model(inspect=inspect)
         return con.name()
+
+    def get_container_names_from_zk(self, cluster):
+        zk_op = Container_ZkOpers()
 
     def get_host_ip_from_zk(self, cluster, container_node):
         zkOper = Container_ZkOpers()
