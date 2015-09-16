@@ -15,7 +15,6 @@ from utils.exceptions import CommonException, UserVisiableException
 from utils import get_current_time, getHostIp
 from zk.zkOpers import Container_ZkOpers
 from status.status_enum import Status
-from componentProxy.componentManagerValidator import ComponentManagerStatusValidator
 from state.stateOpers import StateOpers
 from utils import get_containerClusterName_from_containerName
 
@@ -23,7 +22,6 @@ from utils import get_containerClusterName_from_containerName
 class Container_Opers(object):
 
     docker_opers = Docker_Opers()
-    component_manager_status_validator = ComponentManagerStatusValidator()
 
     def __init__(self):
         '''
@@ -86,9 +84,6 @@ class Container_Opers(object):
             cluster_name, container_name)
         zk_op = Container_ZkOpers()
         return zk_op.check_container_exists(cluster_name, container_node)
-
-    def manager_status_validate(self, component_type, container_name):
-        return self.component_manager_status_validator.validate_manager_status_for_container(component_type, container_name)
 
     def get_container_node_from_container_name(self, cluster, container_name):
         con_node = ''
