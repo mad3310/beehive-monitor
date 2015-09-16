@@ -186,36 +186,3 @@ class StateOpers(object):
         result.setdefault('root_mount', root_mnt_size)
         result.setdefault('volumes_mount', volume_mnt_size)
         return result
-
-    def __extend_memsw(self, times):
-        memsw_value = self.get_con_limit_memsw()
-        extend_value = int(memsw_value) * int(times)
-        if not self.echo_value_to_file(extend_value, self.limit_memsw_path):
-            raise UserVisiableException(
-                'extend container: %s memroy swap faild, please check!' % self.container_name)
-        return extend_value
-
-    def __extend_mem(self, times):
-        mem_value = self.get_con_limit_mem()
-        extend_value = int(mem_value) * int(times)
-        if not self.echo_value_to_file(extend_value, self.limit_mem_path):
-            raise UserVisiableException(
-                'extend container: %s memory faild, please check!' % self.container_name)
-        return extend_value
-
-    def extend_memory(self, times):
-        memsw_ret = self.__extend_memsw(times)
-        mem_ret = self.__extend_mem(times)
-        return memsw_ret and mem_ret
-
-    def set_cpushares(self, cpushares="1024"):
-        if not self.echo_value_to_file(cpushares, self.cpushares_path):
-            raise UserVisiableException('set container :%s cpu.shares value:% failed' % (
-                self.container_name, cpushares))
-        return self.get_cpushares_value()
-
-    def set_cpuset(self, cpus):
-        if not self.echo_value_to_file(cpus, self.cpuset_path):
-            raise UserVisiableException(
-                'set container :%s cpus value:%s failed' % (self.container_name, cpus))
-        return self.get_cpuset_value()

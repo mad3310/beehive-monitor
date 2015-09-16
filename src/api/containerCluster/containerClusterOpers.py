@@ -11,7 +11,6 @@ import logging
 import sys
 
 from status.status_enum import Status
-from common.abstractContainerOpers import Abstract_Container_Opers
 from utils.exceptions import UserVisiableException
 from container.container_model import Container_Model
 from zk.zkOpers import Requests_ZkOpers
@@ -19,7 +18,7 @@ from componentProxy.componentContainerClusterValidator import ComponentContainer
 from utils.threading_exception_queue import Threading_Exception_Queue
 
 
-class ContainerCluster_Opers(Abstract_Container_Opers):
+class ContainerCluster_Opers(object):
 
     component_container_cluster_validator = ComponentContainerClusterValidator()
     threading_exception_queue = Threading_Exception_Queue()

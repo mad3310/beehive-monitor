@@ -27,6 +27,10 @@ class CPURatio(ServerResource):
     def cpu_inc(self):
         return self.total_cpu_inc
 
+    @staticmethod
+    def _cal_ratio(numerator, denominator):
+        return 1.0 * numerator / denominator
+
     def statistic(self):
         ivk_cmd = InvokeCommand()
         cmd = 'grep -E cpu %s' % self.file
@@ -59,10 +63,11 @@ class CPURatio(ServerResource):
             tmp_child_user_cpu = child_cpu_list[0]
             tmp_child_system_cpu = child_cpu_list[2]
             if self.child_cpus.get(i, 0) and self.child_user_cpus.get(i, 0) and self.child_system_cpus.get(i, 0):
-                self.child_user_ratios[i] = 1.0 * (tmp_child_user_cpu - self.child_user_cpus[
-                                                   i]) / (tmp_child_cpu - self.child_cpus[i])
-                self.child_system_ratios[i] = 1.0 * (tmp_child_system_cpu - self.child_system_cpus[
-                                                     i]) / (tmp_child_cpu - self.child_cpus[i])
+                cpu_inc = tmp_child_cpu - self.child_cpus[i]
+                self.child_user_ratios[i] = self._cal_ratio(
+                    (tmp_child_user_cpu - self.child_user_cpus[i]), cpu_inc)
+                self.child_system_ratios[i] = self._cal_ratio(
+                    (tmp_child_system_cpu - self.child_system_cpus[i]), cpu_inc)
             self.child_cpus[i] = tmp_child_cpu
             self.child_user_cpus[i] = tmp_child_user_cpu
             self.child_system_cpus[i] = tmp_child_system_cpu

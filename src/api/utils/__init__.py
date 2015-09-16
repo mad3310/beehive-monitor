@@ -314,3 +314,10 @@ def get_containerClusterName_from_containerName(container_name):
     else:
         containerClusterName = container_name
     return containerClusterName
+
+
+def get_container_type_from_container_name(container_name):
+    l = container_name.split('-')
+    if len(l) < 2:
+        return 'mcl'
+    return l[1]
