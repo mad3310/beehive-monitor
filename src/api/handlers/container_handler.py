@@ -7,20 +7,21 @@ from tornado_letv.tornado_basic_auth import require_basic_auth
 from container.containerOpers import Container_Opers
 from zk.zkOpers import Requests_ZkOpers
 from utils import get_containerClusterName_from_containerName
+from utils.exceptions import HTTPAPIError
 
 
 class BaseContainerHandler(APIHandler):
 
     container_opers = Container_Opers()
 
-    def exists(self, container_name):
+    def check_container_name(self, container_name):
         exists = self.container_opers.check_container_exists(container_name)
         if not exists:
-            massage = {}
-            massage.setdefault(
-                "message", "container %s not exists" % container_name)
-            self.finish(massage)
-        return exists
+            error_message = 'container %s not exist, please check your container name' % container_name
+            raise HTTPAPIError(status_code=417, error_detail=error_message,
+                               notification="direct",
+                               log_message=error_message,
+                               response=error_message)
 
     def get_container_resource(self, container_name, resource_type):
         zk_opers = Requests_ZkOpers()
@@ -43,9 +44,7 @@ class BaseContainerHandler(APIHandler):
 class GatherContainerMemeoyHandler(BaseContainerHandler):
 
     def get(self, container_name):
-
-        if not self.exists(container_name):
-            return
+        self.check_container_name(container_name)
 
         result = self.get_container_resource(container_name, 'memory')
         self.finish(result)
@@ -56,8 +55,7 @@ class GatherContainerCpuacctHandler(BaseContainerHandler):
     container_opers = Container_Opers()
 
     def get(self, container_name):
-        if not self.exists(container_name):
-            return
+        self.check_container_name(container_name)
 
         result = self.get_container_resource(container_name, 'cpuacct')
         self.finish(result)
@@ -66,8 +64,7 @@ class GatherContainerCpuacctHandler(BaseContainerHandler):
 class GatherContainerNetworkioHandler(BaseContainerHandler):
 
     def get(self, container_name):
-        if not self.exists(container_name):
-            return
+        self.check_container_name(container_name)
 
         result = self.get_container_resource(container_name, 'networkio')
         self.finish(result)
@@ -76,8 +73,7 @@ class GatherContainerNetworkioHandler(BaseContainerHandler):
 class GatherContainerDiskIopsHandler(BaseContainerHandler):
 
     def get(self, container_name):
-        if not self.exists(container_name):
-            return
+        self.check_container_name(container_name)
 
         result = self.get_container_resource(container_name, 'diskiops')
         self.finish(result)
@@ -86,8 +82,7 @@ class GatherContainerDiskIopsHandler(BaseContainerHandler):
 class GatherContainerDiskLoadHandler(BaseContainerHandler):
 
     def get(self, container_name):
-        if not self.exists(container_name):
-            return
+        self.check_container_name(container_name)
 
         result = self.get_container_resource(container_name, 'diskload')
         self.finish(result)

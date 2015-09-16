@@ -22,6 +22,10 @@ class CPURatio(ContainerResource):
         self.user_cpu_ratio = 0
         self.system_cpu_ratio = 0
 
+    @staticmethod
+    def _cal_ratio(numerator, denominator):
+        return 1.0 * numerator / denominator
+
     def statistic(self):
         ivk_cmd = InvokeCommand()
         cmd = 'cat %s' % self.file
@@ -31,10 +35,10 @@ class CPURatio(ContainerResource):
         tmp_system = int(total_list[1].split()[1])
         if self.total_user_cpu and self.total_system_cpu:
             cpu_inc = self.server_oprs.server_cpu_ratio.cpu_inc
-            self.user_cpu_ratio = 1.0 * \
-                (tmp_user - self.total_user_cpu) / cpu_inc
-            self.system_cpu_ratio = 1.0 * \
-                (tmp_system - self.total_system_cpu) / cpu_inc
+            self.user_cpu_ratio = self._cal_ratio(
+                (tmp_user - self.total_user_cpu), cpu_inc)
+            self.system_cpu_ratio = self._cal_ratio(
+                (tmp_system - self.total_system_cpu), cpu_inc)
         self.total_user_cpu = tmp_user
         self.total_system_cpu = tmp_system
 
@@ -61,7 +65,7 @@ class NetworkIO(ContainerResource):
         cmd = "sh %s %s" % (options.network_io_sh, self._container_id)
         content = ivk_cmd._runSysCmd(cmd)[0]
         trx_list = re.findall(
-            '.*pbound0\s+\d+\s+\d+\s+(\d+)\s+\d+\s+\d+\s+\d+\s+(\d+).*', content)
+            '.*pbond0\s+\d+\s+\d+\s+(\d+)\s+\d+\s+\d+\s+\d+\s+(\d+).*', content)
         for RX, TX in trx_list:
             RX_SUM += int(RX)
             TX_SUM += int(TX)
@@ -91,19 +95,32 @@ class NetworkIO(ContainerResource):
 
 class DiskIO(ContainerResource):
 
-    def __init__(self, container_id):
+    type_dir_map = {
+        "ngx": "/srv",
+        "mcl": "/srv/docker/vfs",
+        "gbl": "/srv",
+        "jty": "/srv",
+        "gbc": "/srv",
+        "cbs": "/srv",
+        "lgs": "/srv"
+    }
+
+    def __init__(self, container_id, container_type):
         super(DiskIO, self).__init__(container_id)
         self.file = "/cgroup/blkio/lxc/%s/blkio.throttle.io_service_bytes"
-        self.dev_number = self._dev_number()
+        self.dev_number = self._dev_number(container_type)
         self._read_iops = 0
         self._write_iops = 0
         self._total_read_bytes = 0
         self._total_write_bytes = 0
 
-    @staticmethod
-    def _dev_number():
+    def get_mount_dir_by_container_type(self, container_type):
+        return self.type_dir_map.get(container_type, "/srv")
+
+    def _dev_number(self, container_type):
+        mount_dir = self.get_mount_dir_by_container_type(container_type)
         ivk_cmd = InvokeCommand()
-        cmd = "sh %s %s" % (options.disk_number_sh, "/srv/docker/vfs")
+        cmd = "sh %s %s" % (options.disk_number_sh, mount_dir)
         return ivk_cmd._runSysCmd(cmd)[0]
 
     @property
