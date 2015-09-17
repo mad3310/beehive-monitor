@@ -476,40 +476,6 @@ class ZkOpers(object):
     def unLock_server_resource(self, lock):
         self._unLock_base_action(lock)
 
-    def lock_container_cpuacct(self):
-        lock_name = "container/cpuacct"
-        return self._lock_base_action(lock_name)
-
-    def unLock_container_cpuacct(self, lock):
-        self._unLock_base_action(lock)
-
-    def lock_container_memory(self):
-        lock_name = "container/memory"
-        return self._lock_base_action(lock_name)
-
-    def unLock_container_memory(self, lock):
-        self._unLock_base_action(lock)
-
-    def lock_container_diskiops(self):
-        lock_name = "container/diskiops"
-        return self._lock_base_action(lock_name)
-
-    def unLock_container_diskiops(self, lock):
-        self._unLock_base_action(lock)
-
-    def lock_container_diskload(self):
-        lock_name = "container/diskload"
-        return self._lock_base_action(lock_name)
-
-    def unLock_container_diskload(self, lock):
-        self._unLock_base_action(lock)
-
-    def lock_container_networkio(self):
-        lock_name = "container/networkio"
-        return self._lock_base_action(lock_name)
-
-    def unLock_container_networkio(self, lock):
-        self._unLock_base_action(lock)
     '''
     *********************************************Base method*******************************************
     '''

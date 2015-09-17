@@ -29,6 +29,8 @@ class CPURatio(ServerResource):
 
     @staticmethod
     def _cal_ratio(numerator, denominator):
+        if denominator == 0:
+            return 0.0
         return 1.0 * numerator / denominator
 
     def statistic(self):
@@ -48,10 +50,10 @@ class CPURatio(ServerResource):
         tmp_total_system_cpu = total_cpu_list[2]
         if self.total_cpu and self.total_user_cpu and self.total_system_cpu:
             self.total_cpu_inc = tmp_total_cpu - self.total_cpu
-            self.total_user_ratio = 1.0 * \
-                (tmp_total_user_cpu - self.total_user_cpu) / (self.total_cpu_inc)
-            self.total_system_ratio = 1.0 * \
-                (tmp_total_system_cpu - self.total_system_cpu) / (self.total_cpu_inc)
+            self.total_user_ratio = self._cal_ratio(
+                tmp_total_user_cpu - self.total_user_cpu, self.total_cpu_inc)
+            self.total_system_ratio = self._cal_ratio(
+                tmp_total_system_cpu - self.total_system_cpu, self.total_cpu_inc)
         self.total_cpu = tmp_total_cpu
         self.total_user_cpu = tmp_total_user_cpu
         self.total_system_cpu = tmp_total_system_cpu
