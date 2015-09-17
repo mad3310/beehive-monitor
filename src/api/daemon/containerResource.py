@@ -24,6 +24,8 @@ class CPURatio(ContainerResource):
 
     @staticmethod
     def _cal_ratio(numerator, denominator):
+        if denominator == 0:
+            return 0.0
         return 1.0 * numerator / denominator
 
     def statistic(self):
@@ -36,9 +38,9 @@ class CPURatio(ContainerResource):
         if self.total_user_cpu and self.total_system_cpu:
             cpu_inc = self.server_oprs.server_cpu_ratio.cpu_inc
             self.user_cpu_ratio = self._cal_ratio(
-                (tmp_user - self.total_user_cpu), cpu_inc)
+                tmp_user - self.total_user_cpu, cpu_inc)
             self.system_cpu_ratio = self._cal_ratio(
-                (tmp_system - self.total_system_cpu), cpu_inc)
+                tmp_system - self.total_system_cpu, cpu_inc)
         self.total_user_cpu = tmp_user
         self.total_system_cpu = tmp_system
 
@@ -131,12 +133,18 @@ class DiskIO(ContainerResource):
     def write_iops(self):
         return self._write_iops
 
+    @staticmethod
+    def data_valid(data):
+        if data:
+            return 'Read' in data and 'Write' in data
+        return False
+
     def statistic(self):
         _file = self.file % self._container_id
         cmd = "cat %s | grep %s" % (_file, self.dev_number)
         ivk_cmd = InvokeCommand()
         content = ivk_cmd._runSysCmd(cmd)[0]
-        if content:
+        if self.data_valid(content):
             sread = re.findall('Read (\d+)', content)[0]
             swrite = re.findall('Write (\d+)', content)[0]
         else:
