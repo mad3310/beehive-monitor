@@ -29,10 +29,11 @@ class ContainerResourceHandler(object):
             container_id = container.get('Id').replace('/', '')
             cluster_name = get_containerClusterName_from_containerName(
                 container_name)
-            node_name = self.con_op.get_container_node_from_container_name(
-                cluster_name, container_name)
-            container_nodes.append(self.ContainerNode._make(
-                (cluster_name, container_name, node_name, container_id)))
+            if self.con_op.cluster_start(cluster_name):
+                node_name = self.con_op.get_container_node_from_container_name(
+                    cluster_name, container_name)
+                container_nodes.append(self.ContainerNode._make(
+                    (cluster_name, container_name, node_name, container_id)))
         return container_nodes
 
     def write_to_zookeeper(self, cluster_name, container_node, resource_type, resource_value):
