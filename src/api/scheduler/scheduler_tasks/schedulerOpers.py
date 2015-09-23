@@ -8,6 +8,8 @@ Created on 2013-7-21
 '''
 
 from tornado.ioloop import PeriodicCallback
+from tornado.options import options
+
 from scheduler.worker.threading_exception_handle_worker import Thread_Exception_Handler_Worker
 from scheduler.worker.server_resource_worker import ServerResourceWorker
 from scheduler.worker.container_cpuacct_worker import ContainerCPUAcctWorker
@@ -22,15 +24,16 @@ class SchedulerOpers(object):
 
     def __init__(self):
 
-        self.thread_exception_hanlder(5)
-        self.server_resource_handler(5)
-        self.container_cache_handler(3)
+        self.thread_exception_hanlder(10)
+        self.container_cache_handler(7)
 
-        self.container_cpuacct_handler(5)
-        self.container_memory_handler(5)
-        self.container_network_io_handler(5)
-        self.container_disk_iops_handler(5)
-        self.container_disk_load_handler(5)
+        self.server_resource_handler(options.server_gather_duration)
+
+        self.container_cpuacct_handler(options.container_gather_duration)
+        self.container_memory_handler(options.container_gather_duration)
+        self.container_network_io_handler(options.container_gather_duration)
+        self.container_disk_iops_handler(options.container_gather_duration)
+        self.container_disk_load_handler(options.container_gather_duration)
 
     @staticmethod
     def valid(timeout):
