@@ -2,18 +2,18 @@ __author__ = 'mazheng'
 
 import sys
 
-from common.abstractAsyncThread import Abstract_Async_Thread
+from base_worker import BaseWorker
 from resource_letv.containerResourceOpers import ContainerMemoryHandler
 
 
-class ContainerMemoryWorker(Abstract_Async_Thread):
+class ContainerMemoryWorker(BaseWorker):
 
     def __init__(self, timeout=5):
         super(ContainerMemoryWorker, self).__init__()
         self.timeout = timeout
         self.memory_handler = ContainerMemoryHandler()
 
-    def run(self):
+    def job(self):
         try:
             self.memory_handler.gather()
         except Exception:

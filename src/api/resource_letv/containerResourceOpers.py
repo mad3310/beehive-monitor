@@ -10,29 +10,91 @@ from utils import get_containerClusterName_from_containerName, get_container_typ
 from daemon.containerResource import NetworkIO, DiskIO, CPURatio
 
 
+ContainerNode = namedtuple(
+    'ContainerNode', ['cluster_name', 'container_name', 'node_name', 'container_id'])
+
+
+class ContainerCache(object):
+
+    def __init__(self):
+        self.from_cache = set()
+        self.to_cache = set()
+        self.docker_op = Docker_Opers()
+        self.con_op = Container_Opers()
+        self.db = {}
+        self.init()
+
+    def init(self):
+        current_container_ids = self.current_container_ids
+        self.from_cache.update(current_container_ids)
+        self.to_cache.update(current_container_ids)
+
+    def get_container_detail_by_id(self, container_id):
+        return self.db.get(container_id)
+
+    @property
+    def current_container_ids(self, is_all=False):
+        containers_list = []
+        containers = self.docker_op.containers(is_all)
+        for container in containers:
+            container_id = container.get('Id').replace('/', '')
+            container_name = container.get('Names')[0].replace('/', '')
+            cluster_name = get_containerClusterName_from_containerName(
+                container_name)
+            node_name = self.con_op.get_container_node_from_container_name(
+                cluster_name, container_name)
+            containers_list.append(container_id)
+            self.db.update({container_id: ContainerNode._make(
+                (cluster_name, container_name, node_name, container_id))})
+        return containers_list
+
+    @property
+    def new_container_ids(self):
+        return self.from_cache - self.to_cache
+
+    def update(self):
+        self.update_from_cache()
+        self.update_to_cache()
+
+    def update_from_cache(self):
+        self.from_cache = set()
+        self.from_cache.update(self.current_container_ids)
+
+    def update_to_cache(self):
+        self.to_cache = self.to_cache - (self.to_cache - self.from_cache)
+
+    def add_valid_id(self, container_id):
+        self.to_cache.add(container_id)
+
+    @property
+    def current_valid_ids(self):
+        return self.to_cache
+
+
 class ContainerResourceHandler(object):
 
-    ContainerNode = namedtuple(
-        'ContainerNode', ['cluster_name', 'container_name', 'node_name', 'container_id'])
     con_op = Container_Opers()
-    doker_op = Docker_Opers()
+
+    container_cache = ContainerCache()
 
     containers_diskio = {}
     containers_networkio = {}
     containers_cpuratio = {}
 
-    def get_container_nodes(self, is_all=False):
-        containers = self.doker_op.containers(is_all)
+    def get_container_nodes(self):
         container_nodes = []
-        for container in containers:
-            container_name = container.get('Names')[0].replace('/', '')
-            container_id = container.get('Id').replace('/', '')
-            cluster_name = get_containerClusterName_from_containerName(
-                container_name)
-            node_name = self.con_op.get_container_node_from_container_name(
-                cluster_name, container_name)
-            container_nodes.append(self.ContainerNode._make(
-                (cluster_name, container_name, node_name, container_id)))
+        for container_id in self.container_cache.current_valid_ids:
+            detail = self.container_cache.get_container_detail_by_id(
+                container_id)
+            container_nodes.append(detail)
+
+        for container_id in self.container_cache.new_container_ids:
+            detail = self.container_cache.get_container_detail_by_id(
+                container_id)
+            if detail and self.con_op.cluster_start(detail.cluster_name):
+                self.container_cache.add_valid_id(container_id)
+                container_nodes.append(detail)
+
         return container_nodes
 
     def write_to_zookeeper(self, cluster_name, container_node, resource_type, resource_value):
@@ -42,6 +104,12 @@ class ContainerResourceHandler(object):
 
     def gather(self):
         raise NotImplemented("this gather method should be implemented")
+
+
+class ContainerCacheHandler(ContainerResourceHandler):
+
+    def gather(self):
+        self.container_cache.update()
 
 
 class ContainerCPUAcctHandler(ContainerResourceHandler):

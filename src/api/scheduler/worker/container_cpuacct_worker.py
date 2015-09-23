@@ -2,18 +2,18 @@ __author__ = 'mazheng'
 
 import sys
 
-from common.abstractAsyncThread import Abstract_Async_Thread
+from base_worker import BaseWorker
 from resource_letv.containerResourceOpers import ContainerCPUAcctHandler
 
 
-class ContainerCPUAcctWorker(Abstract_Async_Thread):
+class ContainerCPUAcctWorker(BaseWorker):
 
     def __init__(self, timeout=5):
         super(ContainerCPUAcctWorker, self).__init__()
         self.timeout = timeout
         self.cpuacct_handler = ContainerCPUAcctHandler()
 
-    def run(self):
+    def job(self):
         try:
             self.cpuacct_handler.gather()
         except Exception:
