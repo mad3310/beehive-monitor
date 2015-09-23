@@ -25,7 +25,6 @@ define('smtp_from_address', default='mcluster@letv.com', help='smtp from address
 define('smtp_duration', default=10000, type=int, help='smtp duration')
 define('smtp_tls', default=False, type=bool, help='smtp tls')
 
-
 define("base_dir", default=base_dir, help="project base dir")
 define("container_manager_property", default=join(base_dir, "config",
                                                   "containerMonitorAgent.property"), help="container manager config file")
@@ -33,7 +32,6 @@ define("data_node_property", default=join(base_dir, "config",
                                           "dataNode.property"), help="data node config file")
 define("server_cluster_property", default=join(base_dir, "config",
                                                "serverCluster.property"), help="server cluster config file")
-
 
 define("alarm_serious", default="tel:sms:email", help="alarm level is serious")
 define("alarm_general", default="sms:email", help="alarm level is general")
@@ -43,3 +41,8 @@ define("disk_number_sh", default=join(base_dir, "shell",
                                       "disk_number.sh"), help="get disk number script")
 define("network_io_sh", default=join(base_dir, "shell",
                                      "network_io.sh"), help="get network io script")
+
+define("container_gather_duration", default=10,
+       help="container gather resource duration")
+define("server_gather_duration", default=10,
+       help="server gather resource duration")
