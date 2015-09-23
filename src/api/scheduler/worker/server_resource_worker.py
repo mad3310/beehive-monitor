@@ -2,11 +2,11 @@ __author__ = 'mazheng'
 
 import sys
 
-from common.abstractAsyncThread import Abstract_Async_Thread
+from base_worker import BaseWorker
 from resource_letv.serverResourceOpers import ServerCPUHandler, ServerMemoryHandler, ServerDiskHandler
 
 
-class ServerResourceWorker(Abstract_Async_Thread):
+class ServerResourceWorker(BaseWorker):
 
     def __init__(self, timeout=2):
         super(ServerResourceWorker, self).__init__()
@@ -15,7 +15,7 @@ class ServerResourceWorker(Abstract_Async_Thread):
         self.memory_handler = ServerMemoryHandler()
         self.disk_handler = ServerDiskHandler()
 
-    def run(self):
+    def job(self):
         try:
             self._write_server_resource()
         except Exception:

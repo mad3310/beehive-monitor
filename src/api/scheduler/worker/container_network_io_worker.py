@@ -2,18 +2,18 @@ __author__ = 'mazheng'
 
 import sys
 
-from common.abstractAsyncThread import Abstract_Async_Thread
+from base_worker import BaseWorker
 from resource_letv.containerResourceOpers import ContainerNetworkIOHandler
 
 
-class ContainerNetworkIOWorker(Abstract_Async_Thread):
+class ContainerNetworkIOWorker(BaseWorker):
 
     def __init__(self, timeout=5):
         super(ContainerNetworkIOWorker, self).__init__()
         self.timeout = timeout
         self.network_io = ContainerNetworkIOHandler()
 
-    def run(self):
+    def job(self):
         try:
             self.network_io.gather()
         except Exception:
