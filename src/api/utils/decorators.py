@@ -1,5 +1,6 @@
 #!/usr/bin/env python 2.6.6
 # coding:utf-8
+import logging
 
 from utils import get_zk_address
 from exceptions import CommonException
@@ -28,9 +29,11 @@ def zk_singleton(cls):
                 'zookeeper address and port are not written!')
 
         if cls not in instances:
+            logging.info('no zk client, init one')
             instances[cls] = cls(*args, **kw)
 
         if instances[cls].zk is None:
+            logging.info('zk client disconnect, init another one')
             instances[cls] = cls(*args, **kw)
 
         return instances[cls]
