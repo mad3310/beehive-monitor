@@ -85,6 +85,12 @@ class Container_Opers(object):
         zk_op = Container_ZkOpers()
         return zk_op.check_container_exists(cluster_name, container_node)
 
+    @staticmethod
+    def cluster_start(cluster):
+        zkOper = Container_ZkOpers()
+        cluster_info = zkOper.retrieve_container_cluster_info(cluster)
+        return cluster_info.get('start_flag', 'failed') == 'succeed'
+
     def get_container_node_from_container_name(self, cluster, container_name):
         con_node = ''
         zkOper = Container_ZkOpers()
