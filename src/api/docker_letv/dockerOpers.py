@@ -3,12 +3,10 @@ Created on Sep 8, 2014
 
 @author: root
 '''
-import json
+
 import logging
 
-from utils import _get_property_dict
 from docker import Client as client
-from utils.exceptions import CommonException
 
 
 class Docker_Opers(client):
@@ -37,9 +35,6 @@ class Docker_Opers(client):
     def inspect_container(self, container):
         return self.client.inspect_container(container)
 
-    '''
-    @todo: need test
-    '''
 
     def retrieve_containers_ids(self):
         containers_info = self.containers()
@@ -47,10 +42,6 @@ class Docker_Opers(client):
         for container_iter in containers_info:
             id_list.append(container_iter['Id'])
         return id_list
-
-    '''
-    @todo: need test
-    '''
 
     def retrieve_containers_ips(self):
         container_id_list = self.retrieve_containers_ids()

@@ -32,50 +32,7 @@ class IpOpers(object):
     def __init__(self):
         '''
         constructor
-        '''
-    
-    def write_into_ipPool(self, args_dict):
-        doInThread(self._write_into_ipPool, args_dict)
-
-    def _write_into_ipPool(self, args_dict):
-        ip_segment = args_dict.get('ipSegment')
-        ip_count = int(args_dict.get('ipCount'))
-        choosed_ip = self._get_needed_ips(ip_segment, ip_count)
-        
-        zkOper = Common_ZkOpers()
-        
-        for ip in choosed_ip:
-            zkOper.write_ip_into_ipPool(ip)
-
-    def _get_needed_ips(self, ip_segment, ip_count):
-        choosed_ip = []
-        
-        zkOper = Common_ZkOpers()
-        ip_list = zkOper.get_ips_from_ipPool()
-        
-        all_ips = self._get_all_ips(ip_segment)
-        ips = list( set(all_ips) - set(ip_list) )
-        num = 0
-        if len(ips) < ip_count:
-            logging.info('ips usable are not enough, just add %s ips' % len(ips))
-            ip_count = len(ips)
-
-        for ip in ips:
-            if self.__ip_legal(ip):
-                choosed_ip.append(ip)
-                num += 1
-            if num == ip_count:
-                break
-        return choosed_ip
-    
-    def _get_all_ips(self, ip_segment):
-        all_ips = []
-        ip_items = ip_segment.split('.')
-        for i in range(2, 254):
-            ip_items[-1] = str(i)
-            ip = '.'.join(ip_items)
-            all_ips.append(ip)
-        return all_ips       
+        '''     
 
     def __ip_legal(self, ip):
         ip_pattern = '((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}(2[0-4]\d|25[0-5]|[01]?\d\d?)'

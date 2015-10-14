@@ -6,7 +6,7 @@ from tornado.options import options
 
 from utils.invokeCommand import InvokeCommand
 from daemonResource import ContainerResource
-from server.serverOpers import Server_Res_Opers
+from resource_letv.serverResourceOpers import Server_Res_Opers
 
 
 class CPURatio(ContainerResource):

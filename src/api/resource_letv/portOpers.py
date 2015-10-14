@@ -8,7 +8,7 @@ import logging
 from zk.zkOpers import Common_ZkOpers
 from utils.exceptions import CommonException
 from utils import nc_ip_port_available
-from utils.threadUtil import doInThread
+from utils.threadUtil import  doInThread
 
 
 class PortOpers(object):
