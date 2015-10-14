@@ -8,6 +8,18 @@ from server.serverOpers import Server_Opers
 from zk.zkOpers import Requests_ZkOpers
 from utils.exceptions import HTTPAPIError
 
+class UpdateServerHandler(APIHandler):
+    """
+    update server container 
+    """
+    
+    server_opers = Server_Opers()
+    
+    def get(self):
+        self.server_opers.update()
+        return_message = {}
+        return_message.setdefault("message", "update server successful")
+        self.finish(return_message)
 
 class ServerResHandler(APIHandler):
 
@@ -32,17 +44,7 @@ class ServerResHandler(APIHandler):
         return result
 
 
-class CollectServerResHandler(ServerResHandler):
-    # eg. curl http://localhost:8888/server/resource
-
-    def get(self):
-        # not the method is deperacated
-        #server_res = self.server_res_opers.retrieve_host_stat()
-        # self.finish(server_res)
-        pass
-
-
-class GatherServerCpuacctHandler(ServerResHandler):
+class GatherServerCpuHandler(ServerResHandler):
 
     def get(self, host_ip):
         self.check_host_ip(host_ip)

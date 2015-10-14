@@ -2,8 +2,8 @@ __author__ = 'mazheng'
 
 import sys
 
-from base_worker import BaseWorker
-from resource_letv.serverResourceOpers import ServerCPUHandler, ServerMemoryHandler, ServerDiskHandler
+from scheduler.worker.base_worker import BaseWorker
+from resource_letv.serverResourceOpers import ServerCPUHandler, ServerMemoryHandler, ServerDiskHandler, ContainerCountHandler
 
 
 class ServerResourceWorker(BaseWorker):
@@ -14,6 +14,7 @@ class ServerResourceWorker(BaseWorker):
         self.cpu_handler = ServerCPUHandler()
         self.memory_handler = ServerMemoryHandler()
         self.disk_handler = ServerDiskHandler()
+        self.container_count_handler = ContainerCountHandler()
 
     def job(self):
         try:
@@ -25,3 +26,4 @@ class ServerResourceWorker(BaseWorker):
         self.cpu_handler.gather()
         self.memory_handler.gather()
         self.disk_handler.gather()
+        self.container_count_handler.gather()
