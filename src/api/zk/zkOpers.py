@@ -294,6 +294,12 @@ class ZkOpers(object):
         self.DEFAULT_RETRY_POLICY(self.zk.set, path, str(
             monitor_value))  # version need to write
 
+    def retrieve_monitor_server_value(self):
+        clusterUUID = self.getClusterUUID()
+        path = self.rootPath + "/" + clusterUUID + "/monitor/server"
+        resultValue = self._retrieveSpecialPathProp(path)
+        return resultValue
+
     '''
     ***************************************resource********************************************
     '''

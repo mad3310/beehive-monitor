@@ -242,3 +242,20 @@ class Container_Opers(object):
         host_ip = getHostIp()
         zkOper.writeDataNodeContainersResource(
             host_ip, resource_type, resource_info)
+
+    def container_info(self, container_name, _type=None):
+        """get container node info
+        
+        """
+        create_info = {}
+        _inspect = self.docker_opers.inspect_container(container_name)
+        con = Container_Model(_inspect)
+        if not _type:
+            _type = con.inspect_component_type()
+        
+        create_info.setdefault('type', _type)
+        create_info.setdefault('hostIp', getHostIp())
+        create_info.setdefault('inspect', con.inspect)
+        create_info.setdefault('isUseIp', con.use_ip())
+        create_info.setdefault('containerName', container_name)
+        return create_info
