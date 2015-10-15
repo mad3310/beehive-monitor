@@ -25,14 +25,14 @@ class ContainerCache(object):
         self.init()
 
     def init(self):
-        current_container_ids = self.current_container_ids
-        self.from_cache.update(current_container_ids)
-        self.to_cache.update(current_container_ids)
+        current_container_ids = self.current_container_ids()
+        self.current_container_ids = current_container_ids
+        self.from_cache.update(self.current_container_ids)
+        self.to_cache.update(self.current_container_ids)
 
     def get_container_detail_by_id(self, container_id):
         return self.db.get(container_id)
 
-    @property
     def current_container_ids(self, is_all=False):
         containers_list = []
         containers = self.docker_op.containers(is_all)
