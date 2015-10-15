@@ -39,34 +39,33 @@ class ContainerCluster_Opers(object):
 
     def sync(self):
         clusters_zk_info = self.get_clusters_zk()
-
+        
         clusters = []
         for cluster_name, nodes in clusters_zk_info.items():
             try:
                 cluster, nodeInfo = {}, []
-                cluster_exist = self.__get_cluster_status(nodes)
-                cluster.setdefault('status', cluster_exist)
+                logging.info('sync action, cluster name:%s' % cluster)
+                cluster_status = self.component_container_cluster_validator.container_cluster_status_validator(cluster_name)
+                cluster.setdefault('status', cluster_status)
                 cluster.setdefault('clusterName', cluster_name)
-                logging.info('sync action, cluster name:%s' % cluster_name)
-
+                
                 zkOper = Requests_ZkOpers()
-                cluster_info = zkOper.retrieve_container_cluster_info(
-                    cluster_name)
+                cluster_info = zkOper.retrieve_container_cluster_info(cluster_name)
                 _type = cluster_info.get('type')
                 cluster.setdefault('type', _type)
-
-                for _, node_value in nodes.items():
+                
+                for _,node_value in nodes.items():
                     container_info = node_value.get('container_info')
                     con = Container_Model()
                     create_info = con.create_info(container_info)
                     nodeInfo.append(create_info)
                 cluster.setdefault('nodeInfo', nodeInfo)
                 clusters.append(cluster)
-
+                
             except:
                 self.threading_exception_queue.put(sys.exc_info())
                 continue
-
+            
         return clusters
 
     def get_clusters_zk(self):
