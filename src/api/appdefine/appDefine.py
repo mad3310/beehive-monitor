@@ -42,5 +42,3 @@ define("container_gather_duration", default=10,
        help="container gather resource duration")
 define("server_gather_duration", default=10,
        help="server gather resource duration")
-
-

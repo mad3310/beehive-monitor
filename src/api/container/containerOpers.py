@@ -209,19 +209,11 @@ class Container_Opers(object):
         return result
 
     def get_containers_resource(self, resource_type):
-        '''
-            resource_type: memory, networkio, cpuacct, disk and so on.
-        '''
-
         container_name_list = self.get_all_containers(False)
         if not container_name_list:
             return {}
 
-        resource_func_dict = {'memory': 'get_memory_stat_item',
-                              'cpuacct': 'get_cpuacct_stat_item',
-                              'networkio': 'get_network_io',
-                              'disk': 'get_sum_disk_load',
-                              'under_oom': 'get_under_oom_value',
+        resource_func_dict = {'under_oom': 'get_under_oom_value',
                               'oom_kill_disable': 'get_oom_kill_disable_value',
                               }
 

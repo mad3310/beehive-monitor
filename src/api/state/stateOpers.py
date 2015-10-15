@@ -91,33 +91,6 @@ class StateOpers(object):
     def get_cpuset_value(self):
         return self.get_file_value(self.cpuset_path)
 
-    def get_memory_stat_item(self):
-        mem_stat_dict = {}
-        mem_stat_items = self.get_memory_stat_value_list()
-        for item in mem_stat_items:
-            if 'total_rss' in item:
-                total_rss = item.split(' ')[1]
-                mem_stat_dict.setdefault('total_rss', total_rss)
-            elif 'total_swap ' in item:
-                total_swap = item.split(' ')[1]
-                mem_stat_dict.setdefault('total_swap', total_swap)
-            elif 'total_cache ' in item:
-                total_cache = item.split(' ')[1]
-                mem_stat_dict.setdefault('total_cache', total_cache)
-        return mem_stat_dict
-
-    def get_cpuacct_stat_item(self):
-        cpuacct_stat_dict = {}
-        cpuacct_stat_items = self.get_cpuacct_stat_value()
-        for item in cpuacct_stat_items:
-            if 'user' in item:
-                user = item.split(' ')[1]
-                cpuacct_stat_dict.setdefault('user', user)
-            elif 'system ' in item:
-                system = item.split(' ')[1]
-                cpuacct_stat_dict.setdefault('system', system)
-        return cpuacct_stat_dict
-
     def get_oom_kill_disable_value(self):
         value = self.get_file_value(self.under_oom_path)
         under_oom_value = re.findall(

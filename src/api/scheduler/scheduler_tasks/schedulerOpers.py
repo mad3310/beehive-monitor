@@ -17,6 +17,7 @@ from scheduler.worker.container.container_network_io_worker import ContainerNetw
 from scheduler.worker.container.container_disk_iops_worker import ContainerDiskIOPSWorker
 from scheduler.worker.container.container_disk_load_worker import ContainerDiskLoadWorker
 from scheduler.worker.container.container_cache_worker import ContainerCacheWorker
+from scheduler.worker.container.container_oom_worker import Containers_Oom_Worker
 
 from scheduler.worker.server.server_resource_worker import ServerResourceWorker
 from scheduler.worker.server.monitor_check_worker import Monitor_Check_Worker
@@ -45,6 +46,15 @@ class SchedulerOpers(object):
     @staticmethod
     def valid(timeout):
         return timeout > 0
+
+    def container_oom_handler(self, action_timeout):
+        
+        def __container_oom_handler():
+            _woker = Containers_Oom_Worker(action_timeout)
+            _woker.start()
+            
+        _worker = PeriodicCallback(__container_oom_handler, action_timeout * 1000)
+        _worker.start()
 
     def thread_exception_hanlder(self, action_timeout=5):
 
