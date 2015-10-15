@@ -40,9 +40,10 @@ class SchedulerOpers(object):
         self.container_oom_handler(300)
         
         self.server_resource_handler(options.server_gather_duration)
-        self.monitor_check_handler(55)
         self.check_ip_legality_handler(300)
         self.sync_server_zk_handler(240)
+        
+        self.monitor_check_handler(55)
 
     @staticmethod
     def valid(timeout):
