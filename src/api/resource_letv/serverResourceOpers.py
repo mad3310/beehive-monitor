@@ -78,6 +78,21 @@ class Server_Res_Opers():
                            mem['Cached']) / (1024 * 1024)
         return stat
 
+    def disk_io(self):
+        result={}
+        iops={}
+        ivk_cmd=InvokeCommand()
+        cmd = "sh %s %s" % (options.disk_io_sh,"/srv/docker/vfs")
+        content=ivk_cmd._runSysCmd(cmd)[0]
+        iopses=content.split()
+        if len(iopses)==2:
+            iops['read']=float(iopses[0])
+            iops['write']=float(iopses[1])
+        else:
+            iops['read']=iops['write']=0
+        result['iops']=iops
+        return result
+
     def disk_stat(self):
         """
         just for container
@@ -159,6 +174,13 @@ class ServerDiskHandler(ServerResourceHandler):
 
     def gather(self):
         disk_stat = self.server_res_opers.disk_stat()
+        self.write_to_zookeeper("disk", disk_stat)
+
+
+class ServerDiskioHandler(ServerResourceHandler):
+
+    def gather(self):
+        disk_stat = self.server_res_opers.disk_io()
         self.write_to_zookeeper("disk", disk_stat)
 
 

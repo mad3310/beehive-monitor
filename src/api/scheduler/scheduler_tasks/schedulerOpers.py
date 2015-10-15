@@ -32,18 +32,23 @@ class SchedulerOpers(object):
         self.thread_exception_hanlder(10)
         self.container_cache_handler(7)
 
+        """ gather"""
         self.container_cpuacct_handler(options.container_gather_duration)
         self.container_memory_handler(options.container_gather_duration)
         self.container_network_io_handler(options.container_gather_duration)
         self.container_disk_iops_handler(options.container_gather_duration)
         self.container_disk_load_handler(options.container_gather_duration)
         self.container_oom_handler(300)
-        
         self.server_resource_handler(options.server_gather_duration)
+        
+        """ check """
         self.check_ip_legality_handler(300)
+        self.monitor_check_handler(55)
+        
+        """ sync """
         self.sync_server_zk_handler(240)
         
-        self.monitor_check_handler(55)
+        
 
     @staticmethod
     def valid(timeout):

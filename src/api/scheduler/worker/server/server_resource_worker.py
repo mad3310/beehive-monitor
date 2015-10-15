@@ -3,7 +3,7 @@ __author__ = 'mazheng'
 import sys
 
 from scheduler.worker.base_worker import BaseWorker
-from resource_letv.serverResourceOpers import ServerCPUHandler, ServerMemoryHandler, ServerDiskHandler, ContainerCountHandler
+from resource_letv.serverResourceOpers import ServerCPUHandler, ServerMemoryHandler, ServerDiskHandler, ContainerCountHandler, ServerDiskioHandler
 
 
 class ServerResourceWorker(BaseWorker):
@@ -14,6 +14,7 @@ class ServerResourceWorker(BaseWorker):
         self.cpu_handler = ServerCPUHandler()
         self.memory_handler = ServerMemoryHandler()
         self.disk_handler = ServerDiskHandler()
+        self.diskio_handler = ServerDiskioHandler()
         self.container_count_handler = ContainerCountHandler()
 
     def job(self):

@@ -39,7 +39,7 @@ class ServerResCheckcHandler:
         self.check_server_port_num.check()
         
         self.check_server_disk.check()
-        self.check_server_disk_io.check()
+        #self.check_server_disk_io.check()
         self.check_server_memory.check()
 
 
