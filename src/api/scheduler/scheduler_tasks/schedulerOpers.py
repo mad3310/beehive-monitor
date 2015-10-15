@@ -37,6 +37,7 @@ class SchedulerOpers(object):
         self.container_network_io_handler(options.container_gather_duration)
         self.container_disk_iops_handler(options.container_gather_duration)
         self.container_disk_load_handler(options.container_gather_duration)
+        self.container_oom_handler(300)
         
         self.server_resource_handler(options.server_gather_duration)
         self.monitor_check_handler(55)
