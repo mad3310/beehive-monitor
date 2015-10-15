@@ -72,7 +72,6 @@ class IpOpers(object):
         illegal_ips, thread_obj_list = [], []
         zkOper = Common_ZkOpers()
         ip_list = zkOper.get_ips_from_ipPool()
-        logging.info('ips in ip pool:%s' % str(ip_list) )
         logging.info('put all ips in ip pools into store_all_ips_queue')
         
         self.store_all_ips_queue._init(0)
