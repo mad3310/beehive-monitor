@@ -10,7 +10,6 @@ import logging
 
 from docker_letv.dockerOpers import Docker_Opers
 from container.container_model import Container_Model
-from utils.exceptions import UserVisiableException
 
 
 class StateOpers(object):

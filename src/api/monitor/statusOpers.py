@@ -10,7 +10,7 @@ from resource_letv.ipOpers import IpOpers
 from resource_letv.portOpers import PortOpers
 from server.serverOpers import Server_Opers
 from utils import nc_ip_port_available
-from utils.invokeCommand import InvokeCommand
+
 
 TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 

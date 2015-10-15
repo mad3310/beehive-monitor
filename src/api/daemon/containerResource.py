@@ -1,8 +1,7 @@
 __author__ = 'mazheng'
 
+import commands
 import re
-
-from tornado.options import options
 
 from utils.invokeCommand import InvokeCommand
 from daemonResource import ContainerResource
@@ -64,7 +63,7 @@ class NetworkIO(ContainerResource):
     def statistic(self):
         RX_SUM, TX_SUM = 0, 0
         ivk_cmd = InvokeCommand()
-        cmd = "sh %s %s" % (options.network_io_sh, self._container_id)
+        cmd = "ip netns exec %s netstat -i" % self._container_id
         content = ivk_cmd._runSysCmd(cmd)[0]
         trx_list = re.findall(
             '.*pbond0\s+\d+\s+\d+\s+(\d+)\s+\d+\s+\d+\s+\d+\s+(\d+).*', content)
@@ -121,9 +120,12 @@ class DiskIO(ContainerResource):
 
     def _dev_number(self, container_type):
         mount_dir = self.get_mount_dir_by_container_type(container_type)
-        ivk_cmd = InvokeCommand()
-        cmd = "sh %s %s" % (options.disk_number_sh, mount_dir)
-        return ivk_cmd._runSysCmd(cmd)[0]
+        device_cmd = """ls -l `df -P | grep %s | awk '{print $1}'` | awk -F"/" '{print $NF}'""" % mount_dir
+        device = commands.getoutput(device_cmd)
+        device_path = '/dev/%s' % device
+        dev_number_cmd = """ls -l %s | awk '{print $5$6}' | awk -F "," '{print $1":"$2}'""" % device_path
+        dev_num = commands.getoutput(dev_number_cmd)
+        return dev_num
 
     @property
     def read_iops(self):
