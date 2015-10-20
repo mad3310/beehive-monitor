@@ -36,6 +36,7 @@ class Monitor_Check_Worker(Abstract_Async_Thread):
         
         try:
             begin_time = time.time()
+            logging.info("do monitor work every five minutes")
             self.__action_monitor_check()
             while True:
                 end_time = time.time()

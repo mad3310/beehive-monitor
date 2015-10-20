@@ -34,21 +34,14 @@ class GatherClusterResourceHandler(APIHandler):
                                response=error_message)
 
         container_node_list = zkOper.retrieve_container_list(cluster)
-        host_container_dict, result = {}, []
+        result = []
+        
         for container_node in container_node_list:
-            container_name = self.container_opers.get_container_name_from_zk(
-                cluster, container_node)
-            host_ip = self.container_opers.get_host_ip_from_zk(
-                cluster, container_node)
-            host_container_dict.setdefault(host_ip, container_name)
-
-        for host_ip, container_name in host_container_dict.items():
             resource = {}
-            resource_info = zkOper.retrieveDataNodeContainersResource(
-                host_ip, resource_type)
-            container_resource = resource_info.get(resource_type)
-            _resource = container_resource.get(container_name)
-            resource.setdefault('value', _resource)
+            resource_value = zkOper.retrieve_container_resource(cluster, container_node, resource_type)
+            host_ip = self.container_opers.get_host_ip_from_zk(cluster, container_node)
+            container_name = self.container_opers.get_container_name_from_zk(cluster, container_node)
+            resource.setdefault('value', resource_value)
             resource.setdefault('hostIp', host_ip)
             resource.setdefault('containerName', container_name)
             result.append(resource)

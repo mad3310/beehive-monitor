@@ -3,6 +3,7 @@ __author__ = 'mazheng'
 import commands
 import re
 
+from tornado.options import options
 from utils.invokeCommand import InvokeCommand
 from daemonResource import ContainerResource
 from resource_letv.serverResourceOpers import Server_Res_Opers
@@ -63,7 +64,8 @@ class NetworkIO(ContainerResource):
     def statistic(self):
         RX_SUM, TX_SUM = 0, 0
         ivk_cmd = InvokeCommand()
-        cmd = "ip netns exec %s netstat -i" % self._container_id
+        nsenter = options.nsenter % self._container_id
+        cmd = nsenter + "netstat -i"
         content = ivk_cmd._runSysCmd(cmd)[0]
         trx_list = re.findall(
             '.*pbond0\s+\d+\s+\d+\s+(\d+)\s+\d+\s+\d+\s+\d+\s+(\d+).*', content)

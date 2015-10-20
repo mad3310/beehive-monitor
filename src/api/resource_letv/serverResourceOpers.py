@@ -15,7 +15,7 @@ from tornado.options import options
 from utils.invokeCommand import InvokeCommand
 from docker_letv.dockerOpers import Docker_Opers
 from container.containerOpers import Container_Opers
-from zk.zkOpers import Scheduler_ZkOpers, Common_ZkOpers
+from zk.zkOpers import Common_ZkOpers, Scheduler_ZkOpers
 from utils import getHostIp
 from daemon.serverResource import CPURatio
 
@@ -189,6 +189,3 @@ class ContainerCountHandler(ServerResourceHandler):
     def gather(self):
         container_count = self.server_res_opers.container_count()
         self.write_to_zookeeper("container_count", container_count)
-
-
-

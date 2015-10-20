@@ -22,7 +22,6 @@ from scheduler.worker.container.container_oom_worker import Containers_Oom_Worke
 from scheduler.worker.server.server_resource_worker import ServerResourceWorker
 from scheduler.worker.server.monitor_check_worker import Monitor_Check_Worker
 from scheduler.worker.server.check_ip_legality_worker import Check_Ip_Legality_Worker
-from scheduler.worker.server.sync_server_zk_worker import Sync_Server_Zk_Worker
 
 
 class SchedulerOpers(object):
@@ -44,10 +43,6 @@ class SchedulerOpers(object):
         """ check """
         self.check_ip_legality_handler(300)
         self.monitor_check_handler(55)
-        
-        """ sync """
-        self.sync_server_zk_handler(240)
-        
         
 
     @staticmethod
@@ -140,15 +135,6 @@ class SchedulerOpers(object):
             check_ip_legality_worker.start()
             
         _worker = PeriodicCallback(__check_ip_legality_woker, action_timeout * 1000)
-        _worker.start()
-
-    def sync_server_zk_handler(self, action_timeout):
-        
-        def __sync_server_zk_woker():
-            sync_server_zk_woker = Sync_Server_Zk_Worker()
-            sync_server_zk_woker.start()
-            
-        _worker = PeriodicCallback(__sync_server_zk_woker, action_timeout * 1000)
         _worker.start()
 
     def monitor_check_handler(self, action_timeout = 55):
