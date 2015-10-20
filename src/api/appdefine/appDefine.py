@@ -41,3 +41,6 @@ define("container_gather_duration", default=10,
        help="container gather resource duration")
 define("server_gather_duration", default=10,
        help="server gather resource duration")
+
+define("nsenter", default='nsenter --target `docker inspect -f "{{.State.Pid}}" %s` --mount --uts --ipc --net --pid -- ', 
+       help="default test cluster network interface card")
