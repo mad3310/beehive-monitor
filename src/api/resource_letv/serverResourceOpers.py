@@ -189,6 +189,3 @@ class ContainerCountHandler(ServerResourceHandler):
     def gather(self):
         container_count = self.server_res_opers.container_count()
         self.write_to_zookeeper("container_count", container_count)
-
-
-

@@ -8,18 +8,6 @@ from server.serverOpers import Server_Opers
 from zk.zkOpers import Requests_ZkOpers
 from utils.exceptions import HTTPAPIError
 
-class UpdateServerHandler(APIHandler):
-    """
-    update server container 
-    """
-    
-    server_opers = Server_Opers()
-    
-    def get(self):
-        self.server_opers.update()
-        return_message = {}
-        return_message.setdefault("message", "update server successful")
-        self.finish(return_message)
 
 class ServerResHandler(APIHandler):
 
