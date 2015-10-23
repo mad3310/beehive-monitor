@@ -22,7 +22,6 @@ class ContainerCache(object):
         self.docker_op = Docker_Opers()
         self.con_op = Container_Opers()
         self.db = {}
-        self.init()
 
     def init(self):
         current_container_ids = self.current_container_ids
@@ -109,6 +108,7 @@ class ContainerResourceHandler(object):
 class ContainerCacheHandler(ContainerResourceHandler):
 
     def gather(self):
+        self.container_cache.init()
         self.container_cache.update()
 
 

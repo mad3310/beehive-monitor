@@ -122,7 +122,7 @@ class DiskIO(ContainerResource):
 
     def _dev_number(self, container_type):
         mount_dir = self.get_mount_dir_by_container_type(container_type)
-        device_cmd = """ls -l `df -P | grep %s | awk '{print $1}'` | awk -F"/" '{print $NF}'""" % mount_dir
+        device_cmd = """ls -l `df -P | grep %s'$' | awk '{print $1}'` | awk -F"/" '{print $NF}'""" % mount_dir
         device = commands.getoutput(device_cmd)
         device_path = '/dev/%s' % device
         dev_number_cmd = """ls -l %s | awk '{print $5$6}' | awk -F "," '{print $1":"$2}'""" % device_path
