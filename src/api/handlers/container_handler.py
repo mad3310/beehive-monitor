@@ -1,5 +1,12 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
+import time
+
+from concurrent.futures import ThreadPoolExecutor
+
+from tornado.web import asynchronous
+from tornado.gen import engine
+from utils.decorators import run_on_executor,run_callback
 
 from base import APIHandler
 from utils import get_current_time
@@ -8,6 +15,7 @@ from container.containerOpers import Container_Opers
 from zk.zkOpers import Requests_ZkOpers
 from utils import get_containerClusterName_from_containerName
 from utils.exceptions import HTTPAPIError
+
 
 
 class BaseContainerHandler(APIHandler):
@@ -94,7 +102,23 @@ class CheckContainerStatusHandler(BaseContainerHandler):
     classdocs
     '''
     container_opers = Container_Opers()
+    executor = ThreadPoolExecutor(1)
 
+    @asynchronous
+    @engine
     def get(self, container_name):
-        status = self.container_opers.check(container_name)
+        status = yield self.do(container_name)
         self.finish(status)
+
+    @run_on_executor(executor)
+    @run_callback
+    def do(self, container_name):
+        time.sleep(3)
+        return self.container_opers.check(container_name)
+        
+
+
+
+
+
+
