@@ -5,6 +5,8 @@ from __future__ import absolute_import, division, print_function, with_statement
 
 import functools
 import logging
+import sys
+import traceback
 
 from tornado.gen import Task
 from tornado.ioloop import IOLoop
@@ -12,6 +14,7 @@ from tornado import stack_context
 
 from utils import get_zk_address
 from .exceptions import CommonException
+from concurrent.futures import ThreadPoolExecutor
 
 
 def singleton(cls):
@@ -48,7 +51,21 @@ def zk_singleton(cls):
     return _zk_singleton
 
 
-def run_on_executor(executor):
+# def handle_exception(func):
+# 
+#     @functools.wraps(func)
+#     def _handle_exception(*args, **kwargs):
+#         ret = func(*args, **kwargs)
+#         if isinstance(ret, tuple):
+#             ret = "".join([ln for ln in traceback.format_exception(*ret)])
+#             raise
+#     return _handle_exception
+
+
+default_executor =  ThreadPoolExecutor(10)
+
+
+def run_on_executor(executor=default_executor):
 
     def run_on_executor_decorator(func):
 
@@ -66,7 +83,10 @@ def run_callback(func):
     def wrapper(*args, **kwargs):
         callback = kwargs.pop('callback',None)
         assert callback
-        res = func(*args, **kwargs)
+        try:
+            res = func(*args, **kwargs)
+        except:
+            res = sys.exc_info()
         callback = stack_context.wrap(callback)
         IOLoop.instance().add_callback(lambda :callback(res))
     return wrapper
