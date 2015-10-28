@@ -112,6 +112,11 @@ class APIHandler(BaseHandler):
         except Exception:
             logging.error(traceback.format_exc())
 
+    def handle_exception(self, result):
+        if isinstance(result, tuple):
+            self.threading_exception_queue.put(result)
+            #self.finish(HTTPAPIError(500))
+        #self.finish({"meta": {"code": 500, "errorType": "server_error"}})
 
 class ErrorHandler(RequestHandler):
     """Default 404: Not Found handler."""

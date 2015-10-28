@@ -3,6 +3,10 @@ Created on Sep 8, 2014
 
 @author: root
 '''
+from tornado.web import asynchronous
+from tornado.gen import engine
+from utils.decorators import run_on_executor, run_callback
+
 from base import APIHandler
 from server.serverOpers import Server_Opers
 from zk.zkOpers import Requests_ZkOpers
@@ -31,29 +35,33 @@ class ServerResHandler(APIHandler):
         result.setdefault(resource_type, resource_value)
         return result
 
+    @asynchronous
+    @engine
+    def get(self, host_ip, resource_type):
+        result = yield self.do(host_ip, resource_type)
+        self.handle_exception(result)
+        self.finish(result)
+
+    @run_on_executor()
+    @run_callback
+    def do(self, host_ip, resource_type):
+        return self.get_server_resource(host_ip, resource_type)
+
 
 class GatherServerCpuHandler(ServerResHandler):
 
     def get(self, host_ip):
-        self.check_host_ip(host_ip)
-
-        result = self.get_server_resource(host_ip, 'cpu')
-        self.finish(result)
+        super(GatherServerCpuHandler, self).get(host_ip, 'cpu')
 
 
 class GatherServerMemoryHandler(ServerResHandler):
 
     def get(self, host_ip):
-        self.check_host_ip(host_ip)
-
-        result = self.get_server_resource(host_ip, 'memory')
-        self.finish(result)
+        super(GatherServerMemoryHandler, self).get(host_ip, 'memory')
 
 
 class GatherServerDiskHandler(ServerResHandler):
 
     def get(self, host_ip):
-        self.check_host_ip(host_ip)
+        super(GatherServerDiskHandler, self).get(host_ip, 'disk')
 
-        result = self.get_server_resource(host_ip, 'disk')
-        self.finish(result)

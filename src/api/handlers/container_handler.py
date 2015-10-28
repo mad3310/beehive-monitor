@@ -1,9 +1,5 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
-import time
-import traceback
-
-
 
 from tornado.web import asynchronous
 from tornado.gen import engine
@@ -21,9 +17,6 @@ from utils.exceptions import HTTPAPIError
 class BaseContainerHandler(APIHandler):
 
     container_opers = Container_Opers()
-    
-    def __init__(self, resource_type):
-        self.resource_type = resource_type
 
     def check_container_name(self, container_name):
         exists = self.container_opers.check_container_exists(container_name)
@@ -50,69 +43,49 @@ class BaseContainerHandler(APIHandler):
         result.setdefault('time', current_time)
         result.setdefault('containerName', container_name)
         return result
-    
-    def handle_exception(self, result):
-        if isinstance(result, tuple):
-            self.threading_exception_queue.put(result)
-            #self.finish(HTTPAPIError(500))
-        #self.finish({"meta": {"code": 500, "errorType": "server_error"}})
 
     @asynchronous
     @engine
-    def get(self, container_name):
-        result = yield self.do(container_name)
+    def get(self, container_name, resource_type):
+        result = yield self.do(container_name, resource_type)
         self.handle_exception(result)
         self.finish(result)
 
     @run_on_executor()
     @run_callback
-    def do(self, container_name):
+    def do(self, container_name, resource_type):
         self.check_container_name(container_name)
-        return self.get_container_resource(container_name, self.resource_type)
+        return self.get_container_resource(container_name, resource_type)
 
 
 class GatherContainerMemeoyHandler(BaseContainerHandler):
 
     def get(self, container_name):
-        self.check_container_name(container_name)
-
-        result = self.get_container_resource(container_name, 'memory')
-        self.finish(result)
+        super(GatherContainerMemeoyHandler, self).get(container_name, 'memory')
 
 
 class GatherContainerCpuacctHandler(BaseContainerHandler):
 
-    container_opers = Container_Opers()
-
     def get(self, container_name):
-        self.check_container_name(container_name)
-
-        result = self.get_container_resource(container_name, 'cpuacct')
-        self.finish(result)
+        super(GatherContainerCpuacctHandler, self).get(container_name, 'cpuacct')
 
 
 class GatherContainerNetworkioHandler(BaseContainerHandler):
 
     def get(self, container_name):
-        self.check_container_name(container_name)
-
-        result = self.get_container_resource(container_name, 'networkio')
-        self.finish(result)
+        super(GatherContainerNetworkioHandler, self).get(container_name, 'networkio')
 
 
 class GatherContainerDiskIopsHandler(BaseContainerHandler):
 
     def get(self, container_name):
-        self.check_container_name(container_name)
-
-        result = self.get_container_resource(container_name, 'diskiops')
-        self.finish(result)
+        super(GatherContainerDiskIopsHandler, self).get(container_name, 'diskiops')
 
 
 class GatherContainerDiskLoadHandler(BaseContainerHandler):
-
-    def __init__(self):
-        super(GatherContainerDiskLoadHandler, self).__init__('diskload')
+    
+    def get(self, container_name):
+        super(GatherContainerDiskLoadHandler, self).get(container_name, 'diskload')
 
 
 @require_basic_auth
