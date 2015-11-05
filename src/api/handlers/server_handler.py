@@ -39,7 +39,6 @@ class ServerResHandler(APIHandler):
     @engine
     def get(self, host_ip, resource_type):
         result = yield self.do(host_ip, resource_type)
-        self.handle_exception(result)
         self.finish(result)
 
     @run_on_executor()

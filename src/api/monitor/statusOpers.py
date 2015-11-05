@@ -139,8 +139,8 @@ class CheckServerDisk(CheckStatusBase):
         error_record, host_disk = [], {}
         
         for host_ip in host_ip_list:                
-            host_disk = zk_opers.retrieveDataNodeServerResource(host_ip)           
-            if host_disk["server_disk"]["used"] > host_disk["server_disk"]["total"]*0.8:                    
+            host_disk = zk_opers.retrieve_server_resource(host_ip, monitor_key)           
+            if host_disk["used"] > host_disk["total"]*0.8:                    
                 error_record.append('%s' % host_ip)
 
         alarm_level = self.retrieve_alarm_level(len(host_ip_list), len(host_ip_list)-len(error_record), len(error_record))
@@ -157,6 +157,11 @@ class CheckServerDisk(CheckStatusBase):
 
 class CheckServerDiskIO(CheckStatusBase):
 
+
+    """
+    @todo:  retrieveDataNodeServerResource change to retrieve_server_resource
+    """
+    
     def check(self):
         monitor_type, monitor_key = 'server', 'disk_io'
         zk_opers = Scheduler_ZkOpers()
@@ -206,16 +211,16 @@ class CheckResMemory(CheckStatusBase):
         memory_threshold_m = memory_threshold/1024/1024
         
         error_record, host_mem = [], {}
-        for host_ip in host_ip_list:               
-            host_mem = zk_opers.retrieveDataNodeServerResource(host_ip)           
-            if host_mem["mem_res"]["free"] < memory_threshold_m:                    
+        for host_ip in host_ip_list:
+            host_mem = zk_opers.retrieve_server_resource(host_ip, monitor_key)           
+            if host_mem["free"] < memory_threshold_m:                    
                 error_record.append('%s' % host_ip)
 
         alarm_level = self.retrieve_alarm_level(len(host_ip_list), len(host_ip_list)-len(error_record), len(error_record))
         error_message="remaining memory is less than %s M" % memory_threshold_m
         super(CheckResMemory, self).write_status(len(host_ip_list), len(host_ip_list)-len(error_record), len(error_record), alarm_level,
                                                        error_record, monitor_type, monitor_key, error_message)
-        
+
 
     def retrieve_alarm_level(self, total_count, used_count, free_count):
         if free_count == 0:

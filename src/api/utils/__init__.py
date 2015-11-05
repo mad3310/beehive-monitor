@@ -321,3 +321,14 @@ def get_container_type_from_container_name(container_name):
     if len(l) < 2:
         return 'mcl'
     return l[1]
+
+
+"""
+@todo the result of get_dir_size method  is different from shell "du -sh"    
+"""
+def get_dir_size(dir_name):
+    size = 0L
+    for root, _, files in os.walk(dir_name):
+        all_files = [os.path.getsize(os.path.join(root, name)) for name in files if os.path.exists(os.path.join(root, name))]
+        size += sum(all_files)
+    return size

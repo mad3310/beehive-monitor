@@ -2,11 +2,13 @@ __author__ = 'mazheng'
 
 import commands
 import re
+import os
 
 from tornado.options import options
 from utils.invokeCommand import InvokeCommand
 from daemonResource import ContainerResource
 from resource_letv.serverResourceOpers import Server_Res_Opers
+from utils.exceptions import UserVisiableException
 
 
 class CPURatio(ContainerResource):
@@ -125,8 +127,12 @@ class DiskIO(ContainerResource):
         device_cmd = """ls -l `df -P | grep %s'$' | awk '{print $1}'` | awk -F"/" '{print $NF}'""" % mount_dir
         device = commands.getoutput(device_cmd)
         device_path = '/dev/%s' % device
+        if not os.path.exists(device_path):
+            raise UserVisiableException('device :%s not exist! maybe get wrong path' % device_path)
         dev_number_cmd = """ls -l %s | awk '{print $5$6}' | awk -F "," '{print $1":"$2}'""" % device_path
         dev_num = commands.getoutput(dev_number_cmd)
+        if not re.match("\d+\:\d+", dev_num):
+            raise UserVisiableException('get device number wrong :%s' % dev_num)
         return dev_num
 
     @property
@@ -145,6 +151,8 @@ class DiskIO(ContainerResource):
 
     def statistic(self):
         _file = self.file % self._container_id
+        if not re.match("\d+\:\d+", self.dev_number):
+            raise UserVisiableException('get device number wrong :%s' % self.dev_number)
         cmd = "cat %s | grep %s" % (_file, self.dev_number)
         ivk_cmd = InvokeCommand()
         content = ivk_cmd._runSysCmd(cmd)[0]

@@ -99,13 +99,9 @@ class CheckContainerStatusHandler(BaseContainerHandler):
     @engine
     def get(self, container_name):
         result = yield self.do(container_name)
-        self.handle_exception(result)
         self.finish(result)
 
     @run_on_executor()
     @run_callback
     def do(self, container_name):
         return self.container_opers.check(container_name)
-        
-
-

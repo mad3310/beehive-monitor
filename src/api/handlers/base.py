@@ -9,7 +9,6 @@ from utils.exceptions import HTTPAPIError, UserVisiableException
 from utils.mail import send_email
 from utils.invokeCommand import InvokeCommand
 from utils import getHostIp
-from utils.threading_exception_queue import Threading_Exception_Queue
 
 import logging
 import traceback
@@ -18,7 +17,6 @@ import traceback
 class BaseHandler(RequestHandler):
 
     logger = logging.getLogger('root')
-    threading_exception_queue = Threading_Exception_Queue()
 
     def get_all_arguments(self):
         request_param = {}
@@ -112,11 +110,6 @@ class APIHandler(BaseHandler):
         except Exception:
             logging.error(traceback.format_exc())
 
-    def handle_exception(self, result):
-        if isinstance(result, tuple):
-            self.threading_exception_queue.put(result)
-            #self.finish(HTTPAPIError(500))
-        #self.finish({"meta": {"code": 500, "errorType": "server_error"}})
 
 class ErrorHandler(RequestHandler):
     """Default 404: Not Found handler."""

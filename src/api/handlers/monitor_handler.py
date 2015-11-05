@@ -21,7 +21,6 @@ class ContainerStatus(APIHandler):
     @engine
     def get(self):
         result = yield self.do()
-        self.handle_exception(result)
         self.finish(result)
 
     @run_on_executor()

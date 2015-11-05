@@ -15,9 +15,8 @@ define('domain', default="letv.com", help='domain name')
 
 define('send_email_switch', default=True, type=bool,
        help='the flag of if send error email')
-#define('admins', default=("zhangzeng <zhangzeng@letv.com>", "mazheng <mazheng@letv.com>", "zhoubingzheng <zhoubingzheng@letv.com>", "gaoqiang3 <gaoqiang3@letv.com>", "xuyanwei <xuyanwei@letv.com>",),
-#       help='admin email address')
-define('admins', default=("zhangzeng <zhangzeng@letv.com>",), help='admin email address')
+define('admins', default=("zhangzeng <zhangzeng@letv.com>", "mazheng <mazheng@letv.com>", "zhoubingzheng <zhoubingzheng@letv.com>", "gaoqiang3 <gaoqiang3@letv.com>", "xuyanwei <xuyanwei@letv.com>",),
+       help='admin email address')
 define('smtp_host', default="10.205.91.22", help='smtp host')
 define('smtp_port', default=587, help='smtp port')
 define('smtp_user', default="mcluster", help='smtp user')
@@ -40,7 +39,7 @@ define("alarm_nothing", default="nothing", help="no alarm")
 
 define("container_gather_duration", default=10,
        help="container gather resource duration")
-define("server_gather_duration", default=10,
+define("server_gather_duration", default=20,
        help="server gather resource duration")
 
 define("nsenter", default='nsenter --target `docker inspect -f "{{.State.Pid}}" %s` --mount --uts --ipc --net --pid -- ', 
