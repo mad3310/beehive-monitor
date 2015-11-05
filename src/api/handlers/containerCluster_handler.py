@@ -55,7 +55,6 @@ class GatherClusterResourceHandler(APIHandler):
     @engine
     def get(self, cluster, resource_type):
         result = yield self.do(cluster, resource_type)
-        self.handle_exception(result)
         self.finish({'data': result})
 
     @run_on_executor()
@@ -99,7 +98,6 @@ class CheckContainerClusterStatusHandler(APIHandler):
     @engine
     def get(self, cluster):
         result = yield self.do(cluster)
-        self.handle_exception(result)
         self.finish(result)
 
     @run_on_executor()
@@ -125,7 +123,6 @@ class CheckClusterSyncHandler(APIHandler):
         """
         
         result = yield self.do()
-        self.handle_exception(result)
         ret = {}
         ret.setdefault('data', result)
         self.finish(ret)

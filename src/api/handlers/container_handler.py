@@ -48,7 +48,6 @@ class BaseContainerHandler(APIHandler):
     @engine
     def get(self, container_name, resource_type):
         result = yield self.do(container_name, resource_type)
-        self.handle_exception(result)
         self.finish(result)
 
     @run_on_executor()
