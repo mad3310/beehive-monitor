@@ -90,7 +90,7 @@ class ContainerResourceHandler(object):
         for container_id in self.container_cache.new_container_ids:
             detail = self.container_cache.get_container_detail_by_id(
                 container_id)
-            if detail and self.con_op.cluster_start(detail.cluster_name):
+            if detail and self.con_op.cluster_start(detail.cluster_name) and self.con_op.container_legal(detail.container_name):
                 self.container_cache.add_valid_id(container_id)
                 container_nodes.append(detail)
 
