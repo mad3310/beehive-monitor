@@ -46,7 +46,7 @@ class ContainerCluster_Opers(object):
                 cluster, nodeInfo = {}, []
                 logging.info('sync action, cluster name:%s' % cluster)
                 cluster_status = self.component_container_cluster_validator.container_cluster_status_validator(cluster_name)
-                cluster.setdefault('status', cluster_status)
+                cluster.update(cluster_status)
                 cluster.setdefault('clusterName', cluster_name)
                 
                 zkOper = Requests_ZkOpers()
