@@ -92,7 +92,7 @@ class Container_Opers(object):
         cluster_info = zkOper.retrieve_container_cluster_info(cluster)
         return cluster_info.get('start_flag', 'failed') == 'succeed'
 
-    def container_legal(self, container_name):
+    def check_container_name_legal(self, container_name):
         matched = re.match('^d-\w+.*-n-\d', container_name)
         return matched is not None
 

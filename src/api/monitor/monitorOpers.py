@@ -30,7 +30,7 @@ class ServerResCheckcHandler:
     check_res_ip_num = CheckResIpNum()
     check_server_port_num = CheckServerPortNum()
     
-    check_server_disk = CheckServerDisk()
+    check_server_disk_usage = CheckServerDiskUsage()
     #check_server_disk_io = CheckServerDiskIO()
     check_server_memory = CheckResMemory()
     
@@ -38,7 +38,7 @@ class ServerResCheckcHandler:
         self.check_res_ip_num.check()
         self.check_server_port_num.check()
         
-        self.check_server_disk.check()
+        self.check_server_disk_usage.check()
         #self.check_server_disk_io.check()
         self.check_server_memory.check()
 

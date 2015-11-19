@@ -9,6 +9,7 @@ from utils.invokeCommand import InvokeCommand
 from daemonResource import ContainerResource
 from resource_letv.serverResourceOpers import Server_Res_Opers
 from utils.exceptions import UserVisiableException
+from utils import get_dev_number_by_mount_dir
 
 
 class CPURatio(ContainerResource):
@@ -113,7 +114,7 @@ class DiskIO(ContainerResource):
     def __init__(self, container_id, container_type):
         super(DiskIO, self).__init__(container_id)
         self.file = "/cgroup/blkio/lxc/%s/blkio.throttle.io_service_bytes"
-        self.dev_number = self._dev_number(container_type)
+        self.dev_number = get_dev_number_by_mount_dir(container_type)
         self._read_iops = 0
         self._write_iops = 0
         self._total_read_bytes = 0
@@ -121,19 +122,6 @@ class DiskIO(ContainerResource):
 
     def get_mount_dir_by_container_type(self, container_type):
         return self.type_dir_map.get(container_type, "/srv")
-
-    def _dev_number(self, container_type):
-        mount_dir = self.get_mount_dir_by_container_type(container_type)
-        device_cmd = """ls -l `df -P | grep %s'$' | awk '{print $1}'` | awk -F"/" '{print $NF}'""" % mount_dir
-        device = commands.getoutput(device_cmd)
-        device_path = '/dev/%s' % device
-        if not os.path.exists(device_path):
-            raise UserVisiableException('device :%s not exist! maybe get wrong path' % device_path)
-        dev_number_cmd = """ls -l %s | awk '{print $5$6}' | awk -F "," '{print $1":"$2}'""" % device_path
-        dev_num = commands.getoutput(dev_number_cmd)
-        if not re.match("\d+\:\d+", dev_num):
-            raise UserVisiableException('get device number wrong :%s' % dev_num)
-        return dev_num
 
     @property
     def read_iops(self):
@@ -153,22 +141,24 @@ class DiskIO(ContainerResource):
         _file = self.file % self._container_id
         if not re.match("\d+\:\d+", self.dev_number):
             raise UserVisiableException('get device number wrong :%s' % self.dev_number)
-        cmd = "cat %s | grep %s" % (_file, self.dev_number)
-        ivk_cmd = InvokeCommand()
-        content = ivk_cmd._runSysCmd(cmd)[0]
-        if self.data_valid(content):
-            sread = re.findall('Read (\d+)', content)[0]
-            swrite = re.findall('Write (\d+)', content)[0]
+        
+        with open(_file, 'r') as f:
+            content = f.read()
+            f.close()
+        
+        flows = re.findall('%s .*\d?' % self.dev_number, content)
+        if flows:
+            _read = int(filter(lambda x: 'Read' in x , flows)[0])
+            _write = int(filter(lambda x: 'Write' in x , flows)[0])
         else:
-            sread = 0
-            swrite = 0
-        read = int(sread)
-        write = int(swrite)
+            _read = 0
+            _write = 0
+        
         if self._total_read_bytes and self._total_write_bytes:
-            self._read_iops = read - self._total_read_bytes
-            self._write_iops = write - self._total_write_bytes
-        self._total_read_bytes = read
-        self._total_write_bytes = write
+            self._read_iops = _read - self._total_read_bytes
+            self._write_iops = _write - self._total_write_bytes
+        self._total_read_bytes = _read
+        self._total_write_bytes = _write
 
     def get_result(self):
         result = {}

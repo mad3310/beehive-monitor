@@ -67,7 +67,7 @@ class CheckResIpNum(CheckStatusBase):
     def retrieve_alarm_level(self, total_count, success_count, failed_count):
         if 20 < success_count:
             return options.alarm_nothing
-        elif 15 < success_count <= 20:
+        elif 10 < success_count <= 20:
             return options.alarm_general
         else:
             return options.alarm_serious
@@ -126,7 +126,7 @@ class CheckResIpLegality(CheckStatusBase):
             return options.alarm_serious
 
 
-class CheckServerDisk(CheckStatusBase):
+class CheckServerDiskUsage(CheckStatusBase):
 
     def check(self):
         monitor_type, monitor_key = 'server', 'disk'        
@@ -145,7 +145,7 @@ class CheckServerDisk(CheckStatusBase):
 
         alarm_level = self.retrieve_alarm_level(len(host_ip_list), len(host_ip_list)-len(error_record), len(error_record))
         error_message = "disk capacity utilization rate is greater than 70% !"
-        super(CheckServerDisk, self).write_status(len(host_ip_list), len(host_ip_list)-len(error_record), len(error_record), 
+        super(CheckServerDiskUsage, self).write_status(len(host_ip_list), len(host_ip_list)-len(error_record), len(error_record), 
                                                   alarm_level, error_record, monitor_type, monitor_key, error_message)
 
     def retrieve_alarm_level(self, total_count, used_count, free_count):

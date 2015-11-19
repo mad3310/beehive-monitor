@@ -37,9 +37,9 @@ define("alarm_serious", default="tel:sms:email", help="alarm level is serious")
 define("alarm_general", default="sms:email", help="alarm level is general")
 define("alarm_nothing", default="nothing", help="no alarm")
 
-define("container_gather_duration", default=10,
+define("container_gather_duration", default=50,
        help="container gather resource duration")
-define("server_gather_duration", default=20,
+define("server_gather_duration", default=50,
        help="server gather resource duration")
 
 define("nsenter", default='nsenter --target `docker inspect -f "{{.State.Pid}}" %s` --mount --uts --ipc --net --pid -- ', 
