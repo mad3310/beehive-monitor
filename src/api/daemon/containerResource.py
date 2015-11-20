@@ -114,7 +114,8 @@ class DiskIO(ContainerResource):
     def __init__(self, container_id, container_type):
         super(DiskIO, self).__init__(container_id)
         self.file = "/cgroup/blkio/lxc/%s/blkio.throttle.io_service_bytes"
-        self.dev_number = get_dev_number_by_mount_dir(container_type)
+        mount_dir = self.get_mount_dir_by_container_type(container_type)
+        self.dev_number = get_dev_number_by_mount_dir(mount_dir)
         self._read_iops = 0
         self._write_iops = 0
         self._total_read_bytes = 0
@@ -146,10 +147,9 @@ class DiskIO(ContainerResource):
             content = f.read()
             f.close()
         
-        flows = re.findall('%s .*\d?' % self.dev_number, content)
-        if flows:
-            _read = int(filter(lambda x: 'Read' in x , flows)[0])
-            _write = int(filter(lambda x: 'Write' in x , flows)[0])
+        if self.dev_number in content:
+            _read = re.findall('%s Read (\d+ ?)' % self.dev_number, content)[0]
+            _write = re.findall('%s Write (\d+ ?)' % self.dev_number, content)[0]
         else:
             _read = 0
             _write = 0
