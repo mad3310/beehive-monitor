@@ -149,7 +149,9 @@ class DiskIO(ContainerResource):
         
         if self.dev_number in content:
             _read = re.findall('%s Read (\d+ ?)' % self.dev_number, content)[0]
+            _read = int(_read)
             _write = re.findall('%s Write (\d+ ?)' % self.dev_number, content)[0]
+            _write = int(_write)
         else:
             _read = 0
             _write = 0
