@@ -149,13 +149,6 @@ class ZkOpers(object):
         resultValue = self._retrieveSpecialPathProp(_path)
         return resultValue
 
-    def writeDataNodeServerResource(self, ip_address, resource_info):
-        _clusterUUID = self.getClusterUUID()
-        _path = "%s/%s/dataNode/%s/serverResource" % (
-            self.rootPath, _clusterUUID, ip_address)
-        self.zk.ensure_path(_path)
-        self.DEFAULT_RETRY_POLICY(self.zk.set, _path, str(resource_info))
-
     def retrieveDataNodeServerResource(self, ip_address):
         _clusterUUID = self.getClusterUUID()
         _path = "%s/%s/dataNode/%s/serverResource" % (

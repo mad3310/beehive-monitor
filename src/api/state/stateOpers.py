@@ -10,6 +10,7 @@ import logging
 
 from docker_letv.dockerOpers import Docker_Opers
 from container.container_model import Container_Model
+from utils import calc_dir_size
 
 
 class StateOpers(object):
@@ -48,15 +49,6 @@ class StateOpers(object):
         cmd = 'echo %s > %s' % (value, file_path)
         commands.getoutput(cmd)
         return self.get_file_value(file_path) == str(value)
-
-    def get_dir_size(self, dir_path):
-        size = 0
-        dir_cmd = 'du -sm %s' % dir_path
-        if os.path.exists(dir_path):
-            value = commands.getoutput(dir_cmd)
-            if value:
-                size = re.findall('(.*)\\t.*', value)[0]
-        return size
 
     def get_con_used_mem(self):
         return float(self.get_file_value(self.used_mem_path))
@@ -153,7 +145,7 @@ class StateOpers(object):
         return memsw_load_dict
 
     def get_root_mnt_size(self):
-        return self.get_dir_size(self.root_mnt_path)
+        return calc_dir_size(self.root_mnt_path)
 
     def get_volume_mnt_size(self):
         volume_sum_dir = 0
@@ -162,7 +154,7 @@ class StateOpers(object):
         volumes = con.inspect_volumes()
         if volumes:
             for _, server_dir in volumes.items():
-                volume_dir = int(self.get_dir_size(server_dir))
+                volume_dir = int(calc_dir_size(server_dir))
                 volume_sum_dir += volume_dir
         return volume_sum_dir
 

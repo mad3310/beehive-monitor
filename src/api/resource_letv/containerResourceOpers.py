@@ -80,19 +80,25 @@ class ContainerResourceHandler(object):
     containers_networkio = {}
     containers_cpuratio = {}
 
+
+    def add_container_node_condition(self, container_node_detail):
+        is_cluster_start = self.con_op.cluster_start(container_node_detail.cluster_name)
+        is_container_name_legal = self.con_op.check_container_name_legal(container_node_detail.container_name)
+        return container_node_detail and is_cluster_start and is_container_name_legal
+
     def get_container_nodes(self):
         container_nodes = []
         for container_id in self.container_cache.current_valid_ids:
-            detail = self.container_cache.get_container_detail_by_id(
+            container_node_detail = self.container_cache.get_container_detail_by_id(
                 container_id)
-            container_nodes.append(detail)
+            container_nodes.append(container_node_detail)
 
         for container_id in self.container_cache.new_container_ids:
-            detail = self.container_cache.get_container_detail_by_id(
+            container_node_detail = self.container_cache.get_container_detail_by_id(
                 container_id)
-            if detail and self.con_op.cluster_start(detail.cluster_name):
+            if self.add_container_node_condition(container_node_detail):
                 self.container_cache.add_valid_id(container_id)
-                container_nodes.append(detail)
+                container_nodes.append(container_node_detail)
 
         return container_nodes
 

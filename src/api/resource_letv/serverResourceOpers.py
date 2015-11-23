@@ -181,7 +181,7 @@ class ServerDiskioHandler(ServerResourceHandler):
 
     def gather(self):
         disk_stat = self.server_res_opers.disk_io()
-        self.write_to_zookeeper("disk", disk_stat)
+        self.write_to_zookeeper("diskio", disk_stat)
 
 
 class ContainerCountHandler(ServerResourceHandler):

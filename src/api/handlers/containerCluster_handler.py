@@ -5,7 +5,10 @@ Created on Sep 8, 2014
 
 @author: root
 '''
-import logging
+
+from tornado.web import asynchronous
+from tornado.gen import engine
+from utils.decorators import run_on_executor, run_callback
 
 from tornado_letv.tornado_basic_auth import require_basic_auth
 from base import APIHandler
@@ -48,33 +51,40 @@ class GatherClusterResourceHandler(APIHandler):
 
         return result
 
+    @asynchronous
+    @engine
+    def get(self, cluster, resource_type):
+        result = yield self.do(cluster, resource_type)
+        self.finish({'data': result})
+
+    @run_on_executor()
+    @run_callback
+    def do(self, cluster, resource_type):
+        return self.cluster_resoure(cluster, resource_type)
+
 
 class GatherClusterMemeoyHandler(GatherClusterResourceHandler):
 
     def get(self, cluster):
-        result = self.cluster_resoure(cluster, 'memory')
-        self.finish({'data': result})
+        super(GatherClusterMemeoyHandler, self).get(cluster, 'memory')
 
 
 class GatherClusterCpuacctHandler(GatherClusterResourceHandler):
 
     def get(self, cluster):
-        result = self.cluster_resoure(cluster, 'cpuacct')
-        self.finish({'data': result})
+        super(GatherClusterCpuacctHandler, self).get(cluster, 'cpuacct')
 
 
 class GatherClusterNetworkioHandler(GatherClusterResourceHandler):
 
     def get(self, cluster):
-        result = self.cluster_resoure(cluster, 'networkio')
-        self.finish({'data': result})
+        super(GatherClusterNetworkioHandler, self).get(cluster, 'networkio')
 
 
 class GatherClusterDiskHandler(GatherClusterResourceHandler):
 
     def get(self, cluster):
-        result = self.cluster_resoure(cluster, 'disk')
-        self.finish({'data': result})
+        super(GatherClusterDiskHandler, self).get(cluster, 'disk')
 
 
 @require_basic_auth
@@ -83,29 +93,43 @@ class CheckContainerClusterStatusHandler(APIHandler):
     classdocs
     '''
     containerClusterOpers = ContainerCluster_Opers()
-
-    # eg. curl --user root:root -X GET
-    # http://10.154.156.150:8888/containerCluster/status/dh
-    def get(self, containerClusterName):
-        result = self.containerClusterOpers.check(containerClusterName)
+    
+    @asynchronous
+    @engine
+    def get(self, cluster):
+        result = yield self.do(cluster)
         self.finish(result)
+
+    @run_on_executor()
+    @run_callback
+    def do(self, cluster):
+        return self.containerClusterOpers.check(cluster)
 
 
 @require_basic_auth
 class CheckClusterSyncHandler(APIHandler):
-
-    container_cluster_opers = ContainerCluster_Opers()
-
     """
         webportal do info sync every 10 minutes,
         then interface will invoke this class
     """
-    # eg. curl --user root:root -X GET
-    # http://10.154.156.150:8888/containerCluster/sync
 
+    container_cluster_opers = ContainerCluster_Opers()
+    
+    @asynchronous
+    @engine
     def get(self):
-        _clusterInfo = self.container_cluster_opers.sync()
-        logging.info('data:%s' % str(_clusterInfo))
-        result = {}
-        result.setdefault('data', _clusterInfo)
-        self.finish(result)
+        """ # eg. curl --user root:root -X GET
+            # http://10.154.156.150:6666/containerCluster/sync
+        """
+        
+        result = yield self.do()
+        ret = {}
+        ret.setdefault('data', result)
+        self.finish(ret)
+
+    @run_on_executor()
+    @run_callback
+    def do(self):
+        return self.container_cluster_opers.sync()
+
+

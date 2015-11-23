@@ -8,6 +8,7 @@ Created on Sep 8, 2014
 '''
 
 import logging
+import re
 
 from docker_letv.dockerOpers import Docker_Opers
 from container.container_model import Container_Model
@@ -90,6 +91,10 @@ class Container_Opers(object):
         zkOper = Container_ZkOpers()
         cluster_info = zkOper.retrieve_container_cluster_info(cluster)
         return cluster_info.get('start_flag', 'failed') == 'succeed'
+
+    def check_container_name_legal(self, container_name):
+        matched = re.match('^d-\w+.*-n-\d', container_name)
+        return matched is not None
 
     def get_container_node_from_container_name(self, cluster, container_name):
         con_node = ''

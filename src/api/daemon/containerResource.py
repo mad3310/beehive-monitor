@@ -2,11 +2,14 @@ __author__ = 'mazheng'
 
 import commands
 import re
+import os
 
 from tornado.options import options
 from utils.invokeCommand import InvokeCommand
 from daemonResource import ContainerResource
 from resource_letv.serverResourceOpers import Server_Res_Opers
+from utils.exceptions import UserVisiableException
+from utils import get_dev_number_by_mount_dir
 
 
 class CPURatio(ContainerResource):
@@ -111,7 +114,8 @@ class DiskIO(ContainerResource):
     def __init__(self, container_id, container_type):
         super(DiskIO, self).__init__(container_id)
         self.file = "/cgroup/blkio/lxc/%s/blkio.throttle.io_service_bytes"
-        self.dev_number = self._dev_number(container_type)
+        mount_dir = self.get_mount_dir_by_container_type(container_type)
+        self.dev_number = get_dev_number_by_mount_dir(mount_dir)
         self._read_iops = 0
         self._write_iops = 0
         self._total_read_bytes = 0
@@ -119,15 +123,6 @@ class DiskIO(ContainerResource):
 
     def get_mount_dir_by_container_type(self, container_type):
         return self.type_dir_map.get(container_type, "/srv")
-
-    def _dev_number(self, container_type):
-        mount_dir = self.get_mount_dir_by_container_type(container_type)
-        device_cmd = """ls -l `df -P | grep %s'$' | awk '{print $1}'` | awk -F"/" '{print $NF}'""" % mount_dir
-        device = commands.getoutput(device_cmd)
-        device_path = '/dev/%s' % device
-        dev_number_cmd = """ls -l %s | awk '{print $5$6}' | awk -F "," '{print $1":"$2}'""" % device_path
-        dev_num = commands.getoutput(dev_number_cmd)
-        return dev_num
 
     @property
     def read_iops(self):
@@ -145,22 +140,27 @@ class DiskIO(ContainerResource):
 
     def statistic(self):
         _file = self.file % self._container_id
-        cmd = "cat %s | grep %s" % (_file, self.dev_number)
-        ivk_cmd = InvokeCommand()
-        content = ivk_cmd._runSysCmd(cmd)[0]
-        if self.data_valid(content):
-            sread = re.findall('Read (\d+)', content)[0]
-            swrite = re.findall('Write (\d+)', content)[0]
+        if not re.match("\d+\:\d+", self.dev_number):
+            raise UserVisiableException('get device number wrong :%s' % self.dev_number)
+        
+        with open(_file, 'r') as f:
+            content = f.read()
+            f.close()
+        
+        if self.dev_number in content:
+            _read = re.findall('%s Read (\d+ ?)' % self.dev_number, content)[0]
+            _read = int(_read)
+            _write = re.findall('%s Write (\d+ ?)' % self.dev_number, content)[0]
+            _write = int(_write)
         else:
-            sread = 0
-            swrite = 0
-        read = int(sread)
-        write = int(swrite)
+            _read = 0
+            _write = 0
+        
         if self._total_read_bytes and self._total_write_bytes:
-            self._read_iops = read - self._total_read_bytes
-            self._write_iops = write - self._total_write_bytes
-        self._total_read_bytes = read
-        self._total_write_bytes = write
+            self._read_iops = _read - self._total_read_bytes
+            self._write_iops = _write - self._total_write_bytes
+        self._total_read_bytes = _read
+        self._total_write_bytes = _write
 
     def get_result(self):
         result = {}

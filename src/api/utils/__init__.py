@@ -11,6 +11,7 @@ import urllib
 import time
 import json
 import os
+import sys
 
 from tornado.options import options
 from tornado.httpclient import HTTPClient
@@ -20,6 +21,7 @@ from tornado.gen import engine, Task
 from tornado.httpclient import HTTPRequest, AsyncHTTPClient
 from utils.exceptions import CommonException
 from tornado.gen import Callback, Wait
+from stat import S_ISDIR, S_ISREG
 
 confOpers = ConfigFileOpers()
 
@@ -321,3 +323,54 @@ def get_container_type_from_container_name(container_name):
     if len(l) < 2:
         return 'mcl'
     return l[1]
+
+
+def get_file_data(file_path, mode='r'):
+    with open(file_path, mode) as f:
+        data = f.read()
+        f.close()
+    return data
+
+
+def get_dev_number_by_mount_dir(mount_dir):
+    content = get_file_data('/etc/fstab')
+    device_path = re.findall('(\/dev.*?)\s+%s' % mount_dir, content)[0]
+    device_path = os.path.realpath(device_path)
+    
+    parent_device = device_path.split('/')[-1]
+    
+    if not parent_device.startswith('dm'):
+        parent_device = re.sub('\d+', '', parent_device)
+    
+    dev_num_path = r'/sys/class/block/%s/dev'  % parent_device
+    dev_num = get_file_data(dev_num_path)
+    return dev_num.strip()
+
+
+def _walk_dir(file_path, file_list=[]):
+
+    for f in os.listdir(file_path):
+        path_name = os.path.join(file_path, f)
+        if not os.path.islink(path_name):
+            mode = os.stat(path_name).st_mode
+            if S_ISDIR(mode):
+                _walk_dir(path_name, file_list)
+            elif S_ISREG(mode):
+                size = os.stat(path_name).st_size
+                file_list.append(size)
+            else:
+                print 'invalid %s' % path_name
+
+
+"""
+    less than shell command "du -sh"
+    more accurate than command "du -sh"
+    not include dir itself
+    not include softlink itself
+"""
+
+def calc_dir_size(file_path):
+    files = []
+    _walk_dir(file_path, files)
+    return sum(files)
+
