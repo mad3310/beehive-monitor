@@ -359,7 +359,7 @@ def _walk_dir(file_path, file_list=[]):
                 size = os.stat(path_name).st_size
                 file_list.append(size)
             else:
-                print 'invalid %s' % path_name
+                logging.info('invalid path: %s' % path_name)
 
 
 """
