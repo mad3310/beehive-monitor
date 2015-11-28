@@ -107,7 +107,7 @@ class DiskIO(ContainerResource):
         "gbl": "/srv",
         "jty": "/srv",
         "gbc": "/srv",
-        "cbs": "/srv",
+        "cbs": "/opt/letv",
         "lgs": "/srv"
     }
 
