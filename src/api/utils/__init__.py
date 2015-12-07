@@ -350,8 +350,13 @@ def get_dev_number_by_mount_dir(mount_dir):
 def _walk_dir(file_path, file_list=[]):
 
     for f in os.listdir(file_path):
-        path_name = os.path.join(file_path, f)
-        if not os.path.islink(path_name):
+        try:
+            path_name = os.path.join(file_path, f)
+        except UnicodeDecodeError:
+            continue
+        islink = os.path.islink(path_name)
+        is_exists =  os.path.exists(path_name)   
+        if not islink and is_exists:
             mode = os.stat(path_name).st_mode
             if S_ISDIR(mode):
                 _walk_dir(path_name, file_list)
@@ -359,8 +364,8 @@ def _walk_dir(file_path, file_list=[]):
                 size = os.stat(path_name).st_size
                 file_list.append(size)
             else:
-                pass
-                #logging.info('invalid path: %s' % path_name)
+                #pass
+                logging.info('invalid path: %s' % path_name)
 
 
 """
