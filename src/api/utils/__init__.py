@@ -22,6 +22,7 @@ from tornado.httpclient import HTTPRequest, AsyncHTTPClient
 from utils.exceptions import CommonException
 from tornado.gen import Callback, Wait
 from stat import S_ISDIR, S_ISREG
+from os.path import join, getsize
 
 confOpers = ConfigFileOpers()
 
@@ -375,8 +376,14 @@ def _walk_dir(file_path, file_list=[]):
     not include softlink itself
 """
 
+# def calc_dir_size(file_path):
+#     files = []
+#     _walk_dir(file_path, files)
+#     return sum(files)
+
 def calc_dir_size(file_path):
-    files = []
-    _walk_dir(file_path, files)
-    return sum(files)
+    size = 0L
+    for root, dirs, files in os.walk(file_path):
+        size += sum([getsize(join(root, name)) for name in files])
+    return size
 
