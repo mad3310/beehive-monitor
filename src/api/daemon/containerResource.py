@@ -107,7 +107,7 @@ class DiskIO(ContainerResource):
         "gbl": "/srv",
         "jty": "/srv",
         "gbc": "/srv",
-        "cbs": "/srv",
+        "cbs": "/opt/letv",
         "lgs": "/srv"
     }
 
@@ -157,8 +157,8 @@ class DiskIO(ContainerResource):
             _write = 0
         
         if self._total_read_bytes and self._total_write_bytes:
-            self._read_iops = _read - self._total_read_bytes
-            self._write_iops = _write - self._total_write_bytes
+            self._read_iops = (_read - self._total_read_bytes)/options.container_gather_duration
+            self._write_iops = (_write - self._total_write_bytes)/options.container_gather_duration
         self._total_read_bytes = _read
         self._total_write_bytes = _write
 
