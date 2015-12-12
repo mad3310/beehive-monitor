@@ -4,6 +4,7 @@ Created on 2015-12-11
 @author: asus
 '''
 import unittest
+import datetime
 
 import os
 import logging
@@ -13,10 +14,14 @@ from stat import S_ISDIR, S_ISREG
 
 class Test(unittest.TestCase):
     
-    def __get_dir_size(self, dir_name):
+    def get_dir_size(self, dir_name, exclude_dirs=[]):
         size = 0L
         for root, dirs, files in os.walk(dir_name):
+            for exclude_dir in exclude_dirs:
+                if exclude_dir in dirs:
+                    dirs.remove(exclude_dir)
             size += sum([getsize(join(root, name)) for name in files])
+            
         return size
     
     def _walk_dir(self, file_path, file_list=[]):
@@ -43,11 +48,19 @@ class Test(unittest.TestCase):
         files = []
         self._walk_dir(file_path, files)
         return sum(files)
+    
+    def test_calc_dir_size(self):
+        d1 = datetime.datetime.now()
+        dir_size = self.calc_dir_size(r'/')
+        d2 = datetime.datetime.now()
+        print 'There are %.3f' % (dir_size/1024/1024), 'Mbytes in /'
+        print 'operation time diff is %s' % (d2-d1).seconds
 
-    def test_dir_size(self):
-        dir_size = self.__get_dir_size(r'c:\windows')
-        print 'There are %.3f' % (dir_size/1024/1024), 'Mbytes in c:\\windows'
+    def test_get_dir_size(self):
+        d1 = datetime.datetime.now()
+        dir_size = self.get_dir_size(r'/', ['proc', 'data', 'dev', 'lib', 'bin', 'home'])
+        d2 = datetime.datetime.now()
+        print 'There are %.3f' % (dir_size/1024/1024), 'Mbytes in /'
+        print 'operation time diff is %s' % (d2-d1).seconds
         
-    def test_dir_size_1(self):
-        dir_size = self.calc_dir_size(r'c:\windows')
-        print 'There are %.3f' % (dir_size/1024/1024), 'Mbytes in c:\\windows'
+    

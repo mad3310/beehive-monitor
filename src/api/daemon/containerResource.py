@@ -1,3 +1,4 @@
+from appdefine.appDefine import join
 __author__ = 'mazheng'
 
 import commands
@@ -6,12 +7,30 @@ import os
 
 from tornado.options import options
 from utils.invokeCommand import InvokeCommand
-from daemonResource import ContainerResource
+from daemonResource import DaemonResource
 from resource_letv.serverResourceOpers import Server_Res_Opers
 from utils.exceptions import UserVisiableException
 from utils import get_dev_number_by_mount_dir
 
+type_dir_map = {
+        "ngx": "/srv",
+        "mcl": "/srv/docker/vfs",
+        "gbl": "/srv",
+        "jty": "/srv",
+        "gbc": "/srv",
+        "cbs": "/opt/letv",
+        "lgs": "/srv"
+}
 
+class ContainerResource(DaemonResource):
+
+    def __init__(self, container_id):
+        self._container_id = container_id
+
+    @property
+    def container_id(self):
+        return self._container_id
+    
 class CPURatio(ContainerResource):
 
     server_oprs = Server_Res_Opers()
@@ -32,18 +51,22 @@ class CPURatio(ContainerResource):
         return 1.0 * numerator / denominator
 
     def statistic(self):
-        ivk_cmd = InvokeCommand()
-        cmd = 'cat %s' % self.file
-        content = ivk_cmd._runSysCmd(cmd)[0]
+        
+        with open(self.file, 'r') as f:
+            content = f.read()
+            f.close()
+            
         total_list = content.strip().split('\n')
         tmp_user = int(total_list[0].split()[1])
         tmp_system = int(total_list[1].split()[1])
+        
         if self.total_user_cpu and self.total_system_cpu:
             cpu_inc = self.server_oprs.server_cpu_ratio.cpu_inc
             self.user_cpu_ratio = self._cal_ratio(
                 tmp_user - self.total_user_cpu, cpu_inc)
             self.system_cpu_ratio = self._cal_ratio(
                 tmp_system - self.total_system_cpu, cpu_inc)
+            
         self.total_user_cpu = tmp_user
         self.total_system_cpu = tmp_system
 
@@ -65,21 +88,25 @@ class NetworkIO(ContainerResource):
         self._tx = 0
 
     def statistic(self):
-        RX_SUM, TX_SUM = 0, 0
         ivk_cmd = InvokeCommand()
         nsenter = options.nsenter % self._container_id
-        cmd = nsenter + "netstat -i"
-        content = ivk_cmd._runSysCmd(cmd)[0]
+        cmd = join(nsenter, "netstat -i")
+        content = self.ivk_cmd._runSysCmd(cmd)[0]
         trx_list = re.findall(
             '.*pbond0\s+\d+\s+\d+\s+(\d+)\s+\d+\s+\d+\s+\d+\s+(\d+).*', content)
+        
+        RX_SUM, TX_SUM = 0, 0
         for RX, TX in trx_list:
             RX_SUM += int(RX)
             TX_SUM += int(TX)
+            
         rx_sum = RX_SUM
         tx_sum = TX_SUM
+        
         if self._total_tx and self._total_rx:
             self._tx = tx_sum - self._total_tx
             self._rx = rx_sum - self._total_rx
+            
         self._total_rx = rx_sum
         self._total_tx = tx_sum
 
@@ -92,24 +119,15 @@ class NetworkIO(ContainerResource):
         return self._tx
 
     def get_result(self):
-        result = {}
         self.statistic()
-        result['rx'] = self.rx
-        result['tx'] = self.tx
+        result = {
+            'rx' : self.rx,
+            'tx' : self.tx
+        }
         return result
 
 
 class DiskIO(ContainerResource):
-
-    type_dir_map = {
-        "ngx": "/srv",
-        "mcl": "/srv/docker/vfs",
-        "gbl": "/srv",
-        "jty": "/srv",
-        "gbc": "/srv",
-        "cbs": "/opt/letv",
-        "lgs": "/srv"
-    }
 
     def __init__(self, container_id, container_type):
         super(DiskIO, self).__init__(container_id)
@@ -122,7 +140,7 @@ class DiskIO(ContainerResource):
         self._total_write_bytes = 0
 
     def get_mount_dir_by_container_type(self, container_type):
-        return self.type_dir_map.get(container_type, "/srv")
+        return type_dir_map.get(container_type, "/srv")
 
     @property
     def read_iops(self):
@@ -147,14 +165,12 @@ class DiskIO(ContainerResource):
             content = f.read()
             f.close()
         
+        _read,  _write= 0, 0
         if self.dev_number in content:
             _read = re.findall('%s Read (\d+ ?)' % self.dev_number, content)[0]
             _read = int(_read)
             _write = re.findall('%s Write (\d+ ?)' % self.dev_number, content)[0]
             _write = int(_write)
-        else:
-            _read = 0
-            _write = 0
         
         if self._total_read_bytes and self._total_write_bytes:
             self._read_iops = (_read - self._total_read_bytes)/options.container_gather_duration
@@ -163,8 +179,9 @@ class DiskIO(ContainerResource):
         self._total_write_bytes = _write
 
     def get_result(self):
-        result = {}
         self.statistic()
-        result['read'] = self.read_iops
-        result['write'] = self.write_iops
+        result = {
+                  'read' : self.read_iops,
+                  'write' : self.write_iops
+        }
         return result
