@@ -10,7 +10,9 @@ import logging
 
 from docker_letv.dockerOpers import Docker_Opers
 from container.container_model import Container_Model
-from utils import calc_dir_size
+from utils import calc_dir_size, get_container_type_from_container_name
+from tornado.options import options
+from componentProxy import type_mount_map
 
 
 class StateOpers(object):
@@ -32,6 +34,11 @@ class StateOpers(object):
         self.cpuacct_stat_path = '/cgroup/cpuacct/lxc/%s/cpuacct.stat' % self.container_id
         self.cpushares_path = '/cgroup/cpu/lxc/%s/cpu.shares' % self.container_id
         self.cpuset_path = '/cgroup/cpu/lxc/%s/cpuset.cpus' % self.container_id
+        self.mount_disk = self.get_container_mount_disk()
+
+    def get_container_mount_disk(self):
+        container_type = get_container_type_from_container_name(self.container_name)
+        return type_mount_map.get(container_type)
 
     def get_container_id(self):
         _inspect = self.docker_opers.inspect_container(self.container_name)
@@ -148,20 +155,28 @@ class StateOpers(object):
         return calc_dir_size(self.root_mnt_path)
 
     def get_volume_mnt_size(self):
-        volume_sum_dir = 0
         _inspect = self.docker_opers.inspect_container(self.container_name)
         con = Container_Model(_inspect)
         volumes = con.inspect_volumes()
         if volumes:
             for _, server_dir in volumes.items():
-                volume_dir = int(calc_dir_size(server_dir))
-                volume_sum_dir += volume_dir
-        return volume_sum_dir
+                if self.mount_disk in server_dir:
+                    volume_dir = int(calc_dir_size(server_dir))
+        return volume_dir
 
     def get_sum_disk_load(self):
         result = {}
         root_mnt_size = self.get_root_mnt_size()
-        volume_mnt_size = self.get_volume_mnt_size()
+        root_occupancy_ratio = root_mnt_size / options.container_rootfs_size
+        root_occupancy_ratio = '%s%%' % root_occupancy_ratio*100
         result.setdefault('root_mount', root_mnt_size)
+        result.setdefault('root_ratio', root_occupancy_ratio)
+        
+        volume_mnt_size = self.get_volume_mnt_size()
+        container_mount_diskload = calc_dir_size(self.mount_disk)
+        volume_ccupancy_ratio = volume_mnt_size / container_mount_diskload
+        volume_ccupancy_ratio = '%s%%' % volume_ccupancy_ratio*100
         result.setdefault('volumes_mount', volume_mnt_size)
+        result.setdefault('volumes_mount', volume_ccupancy_ratio)
         return result
+

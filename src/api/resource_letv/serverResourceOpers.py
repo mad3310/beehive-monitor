@@ -93,12 +93,12 @@ class Server_Res_Opers():
         result['iops']=iops
         return result
 
-    def disk_stat(self):
+    def disk_stat(self, _path="/srv"):
         """
         just for container
         """
         hd = {}
-        disk = os.statvfs("/srv")
+        disk = os.statvfs(_path)
         hd['free'] = disk.f_bsize * disk.f_bavail / (1024 * 1024)
         hd['total'] = disk.f_bsize * disk.f_blocks / (1024 * 1024)
         hd['used'] = hd['total'] - hd['free']

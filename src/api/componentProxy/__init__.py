@@ -8,3 +8,14 @@ _path = {
     "cbase": "componentProxy.store",
     "logstash": "componentProxy.webcontainer",
 }
+
+
+type_mount_map = {
+    "ngx": "/var/log",
+    "mcl": "/srv/docker/vfs",
+    "gbl": "/srv",
+    "jty": "/var/log",
+    "gbc": "/srv",
+    "cbs": "/opt/letv",
+    "lgs": "/srv"
+}

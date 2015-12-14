@@ -1,8 +1,6 @@
 __author__ = 'mazheng'
 
-import commands
 import re
-import os
 
 from tornado.options import options
 from utils.invokeCommand import InvokeCommand
@@ -10,6 +8,7 @@ from daemonResource import ContainerResource
 from resource_letv.serverResourceOpers import Server_Res_Opers
 from utils.exceptions import UserVisiableException
 from utils import get_dev_number_by_mount_dir
+from componentProxy import type_mount_map
 
 
 class CPURatio(ContainerResource):
@@ -101,16 +100,6 @@ class NetworkIO(ContainerResource):
 
 class DiskIO(ContainerResource):
 
-    type_dir_map = {
-        "ngx": "/srv",
-        "mcl": "/srv/docker/vfs",
-        "gbl": "/srv",
-        "jty": "/srv",
-        "gbc": "/srv",
-        "cbs": "/opt/letv",
-        "lgs": "/srv"
-    }
-
     def __init__(self, container_id, container_type):
         super(DiskIO, self).__init__(container_id)
         self.file = "/cgroup/blkio/lxc/%s/blkio.throttle.io_service_bytes"
@@ -122,7 +111,7 @@ class DiskIO(ContainerResource):
         self._total_write_bytes = 0
 
     def get_mount_dir_by_container_type(self, container_type):
-        return self.type_dir_map.get(container_type, "/srv")
+        return type_mount_map.get(container_type, "/srv")
 
     @property
     def read_iops(self):
