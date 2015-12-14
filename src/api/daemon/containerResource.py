@@ -91,7 +91,7 @@ class NetworkIO(ContainerResource):
         ivk_cmd = InvokeCommand()
         nsenter = options.nsenter % self._container_id
         cmd = join(nsenter, "netstat -i")
-        content = self.ivk_cmd._runSysCmd(cmd)[0]
+        content = ivk_cmd._runSysCmd(cmd)[0]
         trx_list = re.findall(
             '.*pbond0\s+\d+\s+\d+\s+(\d+)\s+\d+\s+\d+\s+\d+\s+(\d+).*', content)
         
@@ -175,6 +175,7 @@ class DiskIO(ContainerResource):
         if self._total_read_bytes and self._total_write_bytes:
             self._read_iops = (_read - self._total_read_bytes)/options.container_gather_duration
             self._write_iops = (_write - self._total_write_bytes)/options.container_gather_duration
+            
         self._total_read_bytes = _read
         self._total_write_bytes = _write
 

@@ -6,7 +6,6 @@ Created on Apr 5, 2015
 import os
 import commands
 import re
-import logging
 
 from docker_letv.dockerOpers import Docker_Opers
 from container.container_model import Container_Model
@@ -38,50 +37,45 @@ class StateOpers(object):
         con = Container_Model(_inspect)
         return con.id()
 
-    def get_file_value(self, file_path):
+    def __get_file_value(self, file_path):
         value = ''
         file_cmd = 'cat %s' % file_path
         if os.path.exists(file_path):
             value = commands.getoutput(file_cmd)
         return value
 
-    def echo_value_to_file(self, value, file_path):
-        cmd = 'echo %s > %s' % (value, file_path)
-        commands.getoutput(cmd)
-        return self.get_file_value(file_path) == str(value)
-
     def get_con_used_mem(self):
-        return float(self.get_file_value(self.used_mem_path))
+        return float(self.__get_file_value(self.used_mem_path))
 
     def get_con_used_memsw(self):
-        return float(self.get_file_value(self.used_memsw_path))
+        return float(self.__get_file_value(self.used_memsw_path))
 
     def get_con_limit_mem(self):
-        return float(self.get_file_value(self.limit_mem_path))
+        return float(self.__get_file_value(self.limit_mem_path))
 
     def get_con_limit_memsw(self):
-        return float(self.get_file_value(self.limit_memsw_path))
+        return float(self.__get_file_value(self.limit_memsw_path))
 
     def get_under_oom_value(self):
-        value = self.get_file_value(self.under_oom_path)
+        value = self.__get_file_value(self.under_oom_path)
         under_oom_value = re.findall('.*under_oom (\d)$', value)[0]
         return int(under_oom_value)
 
     def get_memory_stat_value_list(self):
-        value = self.get_file_value(self.memory_stat_path)
+        value = self.__get_file_value(self.memory_stat_path)
         if value:
             return value.split('\n')
         return []
 
     def get_cpuacct_stat_value(self):
-        value = self.get_file_value(self.cpuacct_stat_path)
+        value = self.__get_file_value(self.cpuacct_stat_path)
         return value.split('\n')
 
     def get_cpushares_value(self):
-        return self.get_file_value(self.cpushares_path)
+        return self.__get_file_value(self.cpushares_path)
 
     def get_cpuset_value(self):
-        return self.get_file_value(self.cpuset_path)
+        return self.__get_file_value(self.cpuset_path)
 
     def get_memory_stat_item(self):
         mem_stat_dict = {}
@@ -99,26 +93,10 @@ class StateOpers(object):
         return mem_stat_dict
 
     def get_oom_kill_disable_value(self):
-        value = self.get_file_value(self.under_oom_path)
+        value = self.__get_file_value(self.under_oom_path)
         under_oom_value = re.findall(
             'oom_kill_disable (\d)\\nunder_oom.*', value)[0]
         return int(under_oom_value)
-
-    def _change_container_under_oom(self, switch_value):
-        if not os.path.exists(self.under_oom_path):
-            logging.error(' container: %s under oom path not exist' %
-                          self.container_name)
-            return
-        cmd = 'echo %s > %s' % (switch_value, self.under_oom_path)
-        commands.getoutput(cmd)
-
-    def open_container_under_oom(self):
-        self._change_container_under_oom(0)
-        return self.get_oom_kill_disable_value() == 0
-
-    def shut_container_under_oom(self):
-        self._change_container_under_oom(1)
-        return self.get_oom_kill_disable_value() == 1
 
     def get_mem_load(self):
         mem_load_rate, mem_load_dict = 0, {}
@@ -158,7 +136,7 @@ class StateOpers(object):
                 volume_sum_dir += volume_dir
         return volume_sum_dir
 
-    def get_sum_disk_load(self):
+    def get_sum_disk_usage(self):
         result = {}
         root_mnt_size = self.get_root_mnt_size()
         volume_mnt_size = self.get_volume_mnt_size()

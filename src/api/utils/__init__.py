@@ -349,7 +349,7 @@ def get_dev_number_by_mount_dir(mount_dir):
 
 
 def _walk_dir(file_path, file_list=[]):
-
+ 
     for f in os.listdir(file_path):
         try:
             path_name = os.path.join(file_path, f)
@@ -376,14 +376,14 @@ def _walk_dir(file_path, file_list=[]):
     not include softlink itself
 """
 
-# def calc_dir_size(file_path):
-#     files = []
-#     _walk_dir(file_path, files)
-#     return sum(files)
-
 def calc_dir_size(file_path):
-    size = 0L
-    for root, dirs, files in os.walk(file_path):
-        size += sum([getsize(join(root, name)) for name in files])
-    return size
+    files = []
+    _walk_dir(file_path, files)
+    return sum(files)
+
+# def calc_dir_size(file_path):
+#     size = 0L
+#     for root, dirs, files in os.walk(file_path):
+#         size += sum([getsize(join(root, name)) for name in files])
+#     return size
 
