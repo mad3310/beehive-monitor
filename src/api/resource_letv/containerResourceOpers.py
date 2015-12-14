@@ -158,15 +158,15 @@ class ContainerDiskIOPSHandler(ContainerResourceHandler):
                 container_node.cluster_name, container_node.node_name, 'diskiops', disk_iops)
 
 
-class ContainerDiskLoadHandler(ContainerResourceHandler):
+class ContainerDiskUsageHandler(ContainerResourceHandler):
 
     def gather(self):
         container_nodes = self.get_container_nodes()
         for container_node in container_nodes:
             state_op = StateOpers(container_node.container_name)
-            disk_iops = state_op.get_sum_disk_load()
+            disk_usage = state_op.get_sum_disk_usage()
             self.write_to_zookeeper(
-                container_node.cluster_name, container_node.node_name, 'diskload', disk_iops)
+                container_node.cluster_name, container_node.node_name, 'diskload', disk_usage)
 
 
 class ContainerNetworkIOHandler(ContainerResourceHandler):
