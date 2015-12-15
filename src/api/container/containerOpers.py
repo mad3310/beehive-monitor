@@ -200,17 +200,6 @@ class Container_Opers(object):
         host_cons = self.get_all_containers(False)
         return list(set(host_cons) & set(container_name_list))
 
-    def get_containers_disk_load(self, container_name_list):
-        result = {}
-        containers = self._get_containers(container_name_list)
-        for container in containers:
-            load = {}
-            conl = StateOpers(container)
-            root_mnt_size, _ = conl.get_sum_disk_usage()
-            load.setdefault('root_mount', root_mnt_size)
-            result.setdefault(container, load)
-        return result
-
     def get_containers_resource(self, resource_type):
         container_name_list = self.get_all_containers(False)
         if not container_name_list:

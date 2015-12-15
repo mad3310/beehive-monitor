@@ -348,7 +348,7 @@ def get_dev_number_by_mount_dir(mount_dir):
 
 
 def _walk_dir(file_path, file_list=[]):
-
+ 
     for f in os.listdir(file_path):
         try:
             path_name = os.path.join(file_path, f)
@@ -379,4 +379,3 @@ def calc_dir_size(file_path):
     files = []
     _walk_dir(file_path, files)
     return sum(files)
-

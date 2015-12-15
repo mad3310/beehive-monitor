@@ -6,7 +6,6 @@ Created on Apr 5, 2015
 import os
 import commands
 import re
-import logging
 
 from docker_letv.dockerOpers import Docker_Opers
 from container.container_model import Container_Model

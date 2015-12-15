@@ -132,6 +132,7 @@ class DiskIO(ContainerResource):
     def get_mount_dir_by_container_type(self, container_type):
         return type_mount_map.get(container_type, "/srv")
 
+
     @property
     def read_iops(self):
         return self._read_iops

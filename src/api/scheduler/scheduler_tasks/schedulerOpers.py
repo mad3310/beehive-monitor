@@ -15,7 +15,7 @@ from scheduler.worker.container.container_cpuacct_worker import ContainerCPUAcct
 from scheduler.worker.container.container_memory_worker import ContainerMemoryWorker
 from scheduler.worker.container.container_network_io_worker import ContainerNetworkIOWorker
 from scheduler.worker.container.container_disk_iops_worker import ContainerDiskIOPSWorker
-from scheduler.worker.container.container_disk_load_worker import ContainerDiskLoadWorker
+from scheduler.worker.container.container_disk_usage_worker import ContainerDiskUsageWorker
 from scheduler.worker.container.container_cache_worker import ContainerCacheWorker
 from scheduler.worker.container.container_oom_worker import Containers_Oom_Worker
 
@@ -96,8 +96,7 @@ class SchedulerOpers(object):
     def container_network_io_handler(self, action_timeout=5):
 
         if self.valid(action_timeout):
-            container_network_io_worker = ContainerNetworkIOWorker(
-                action_timeout)
+            container_network_io_worker = ContainerNetworkIOWorker(action_timeout)
             container_network_io = PeriodicCallback(
                 container_network_io_worker, action_timeout * 1000)
             container_network_io.start()
