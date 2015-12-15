@@ -17,12 +17,12 @@ ContainerNode = namedtuple(
 class ContainerCache(object):
 
     def __init__(self):
-        self.init()
         self.from_cache = set()
         self.to_cache = set()
         self.docker_op = Docker_Opers()
         self.con_op = Container_Opers()
         self.db = {}
+        self.init()
 
     def init(self):
         current_container_ids = self.current_container_ids

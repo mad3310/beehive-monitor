@@ -392,3 +392,11 @@ def disk_stat(_path):
 
 def timestamp(style = '%Y-%m-%d %H:%M:%S'):
     return time.strftime(style, time.localtime())
+
+
+def check_server_on_zk():
+    confDict = confOpers.getValue(options.container_manager_property)
+    zk_port = confDict.get('zkPort')
+    zk_addr = confDict.get('zkAddress')
+    return zk_addr and zk_port
+    

@@ -22,6 +22,7 @@ from scheduler.worker.container.container_oom_worker import Containers_Oom_Worke
 from scheduler.worker.server.server_resource_worker import ServerResourceWorker
 from scheduler.worker.server.monitor_check_worker import Monitor_Check_Worker
 from scheduler.worker.server.check_ip_legality_worker import Check_Ip_Legality_Worker
+from utils import check_server_on_zk
 
 
 class SchedulerOpers(object):
@@ -29,21 +30,22 @@ class SchedulerOpers(object):
     def __init__(self):
 
         self.thread_exception_hanlder(10)
-        self.container_cache_handler(7)
-
-        """ gather"""
-        self.container_cpuacct_handler(options.container_gather_duration)
-        self.container_memory_handler(options.container_gather_duration)
-        self.container_network_io_handler(options.container_gather_duration)
-        self.container_disk_iops_handler(options.container_gather_duration)
-        self.container_disk_usage_handler(10800)
-        self.container_oom_handler(300)
-        self.server_resource_handler(options.server_gather_duration)
         
-        """ check """
-        self.check_ip_legality_handler(300)
-        self.monitor_check_handler(55)
-        
+        if check_server_on_zk():
+            self.container_cache_handler(7)
+    
+            """ gather"""
+            self.container_cpuacct_handler(options.container_gather_duration)
+            self.container_memory_handler(options.container_gather_duration)
+            self.container_network_io_handler(options.container_gather_duration)
+            self.container_disk_iops_handler(options.container_gather_duration)
+            self.container_disk_usage_handler(10800)
+            self.container_oom_handler(300)
+            self.server_resource_handler(options.server_gather_duration)
+            
+            """ check """
+            self.check_ip_legality_handler(300)
+            self.monitor_check_handler(55)
 
     @staticmethod
     def valid(timeout):
