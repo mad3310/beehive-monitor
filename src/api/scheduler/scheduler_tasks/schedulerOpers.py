@@ -32,7 +32,7 @@ class SchedulerOpers(object):
         self.thread_exception_hanlder(10)
         
         if check_server_on_zk():
-            self.container_cache_handler(7)
+            self.container_cache_handler(20)
     
             """ gather"""
             self.container_cpuacct_handler(options.container_gather_duration)

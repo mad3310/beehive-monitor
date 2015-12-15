@@ -1,4 +1,3 @@
-from appdefine.appDefine import join
 __author__ = 'mazheng'
 
 import re
@@ -10,6 +9,7 @@ from resource_letv.serverResourceOpers import Server_Res_Opers
 from utils.exceptions import UserVisiableException
 from utils import get_dev_number_by_mount_dir, timestamp
 from componentProxy import type_mount_map
+from appdefine.appDefine import join
 
 
 class ContainerResource(DaemonResource):
