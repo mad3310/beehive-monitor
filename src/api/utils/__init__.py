@@ -385,7 +385,7 @@ def disk_stat(_path):
     
     hd = {}
     disk = os.statvfs(_path)
-    hd['free'] = disk.f_bsize * disk.f_bavail / (1024 * 1024)
-    hd['total'] = disk.f_bsize * disk.f_blocks / (1024 * 1024)
+    hd['free'] = disk.f_bsize * disk.f_bavail
+    hd['total'] = disk.f_bsize * disk.f_blocks
     hd['used'] = hd['total'] - hd['free']
     return hd

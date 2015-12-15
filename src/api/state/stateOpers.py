@@ -142,16 +142,16 @@ class StateOpers(object):
         return volume_dir
 
     def get_disk_total_size(self, _path):
-        disk_stat = disk_stat(_path)
-        return disk_stat.get('total')
+        disk_detail = disk_stat(_path)
+        return disk_detail.get('total')
 
     def get_sum_disk_usage(self):
         result = {}
-        
+
         volume_mnt_size = self.get_volume_mnt_size()
         container_mount_diskload = self.get_disk_total_size(self.mount_disk)
-        volume_ccupancy_ratio = volume_mnt_size / container_mount_diskload
-        volume_ccupancy_ratio = '%s%%' % volume_ccupancy_ratio*100
+        volume_ccupancy_ratio = float(volume_mnt_size) / container_mount_diskload * 100
+        volume_ccupancy_ratio = '%.2f%%' % volume_ccupancy_ratio
         result.setdefault('volumes_mount', volume_mnt_size)
         result.setdefault('volumes_ratio', volume_ccupancy_ratio)
         return result
