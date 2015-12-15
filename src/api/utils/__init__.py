@@ -389,3 +389,6 @@ def disk_stat(_path):
     hd['total'] = disk.f_bsize * disk.f_blocks
     hd['used'] = hd['total'] - hd['free']
     return hd
+
+def timestamp(style = '%Y-%m-%d %H:%M:%S'):
+    return time.strftime(style, time.localtime())

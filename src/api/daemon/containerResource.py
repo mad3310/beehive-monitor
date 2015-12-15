@@ -8,7 +8,7 @@ from utils.invokeCommand import InvokeCommand
 from daemonResource import DaemonResource
 from resource_letv.serverResourceOpers import Server_Res_Opers
 from utils.exceptions import UserVisiableException
-from utils import get_dev_number_by_mount_dir
+from utils import get_dev_number_by_mount_dir, timestamp
 from componentProxy import type_mount_map
 
 
@@ -65,6 +65,7 @@ class CPURatio(ContainerResource):
         result = {}
         result['total'] = {"user": self.user_cpu_ratio,
                            "system": self.system_cpu_ratio}
+        result.setdefault('ctime', timestamp())
         return result
 
 
@@ -111,6 +112,7 @@ class NetworkIO(ContainerResource):
     def get_result(self):
         self.statistic()
         result = {
+            'ctime' : timestamp(), 
             'rx' : self.rx,
             'tx' : self.tx
         }
@@ -174,6 +176,7 @@ class DiskIO(ContainerResource):
         self.statistic()
         result = {
                   'read' : self.read_iops,
-                  'write' : self.write_iops
+                  'write' : self.write_iops,
+                  'ctime' : timestamp(),
         }
         return result

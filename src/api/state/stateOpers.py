@@ -8,7 +8,7 @@ import re
 
 from docker_letv.dockerOpers import Docker_Opers
 from container.container_model import Container_Model
-from utils import calc_dir_size, get_container_type_from_container_name, disk_stat
+from utils import calc_dir_size, get_container_type_from_container_name, disk_stat, timestamp
 from componentProxy import type_mount_map
 
 
@@ -86,6 +86,7 @@ class StateOpers(object):
         mem_stat_dict = {}
         mem_stat_items = self.get_memory_stat_value_list()
         for item in mem_stat_items:
+            mem_stat_dict.setdefault('ctime', timestamp())
             if 'total_rss' in item:
                 total_rss = item.split(' ')[1]
                 mem_stat_dict.setdefault('total_rss', total_rss)
@@ -154,4 +155,5 @@ class StateOpers(object):
         volume_ccupancy_ratio = '%.2f%%' % volume_ccupancy_ratio
         result.setdefault('volumes_mount', volume_mnt_size)
         result.setdefault('volumes_ratio', volume_ccupancy_ratio)
+        result.setdefault('ctime', timestamp())
         return result
