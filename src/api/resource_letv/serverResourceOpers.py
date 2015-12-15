@@ -15,7 +15,7 @@ from utils.invokeCommand import InvokeCommand
 from docker_letv.dockerOpers import Docker_Opers
 from container.containerOpers import Container_Opers
 from zk.zkOpers import Common_ZkOpers, Scheduler_ZkOpers
-from utils import getHostIp
+from utils import getHostIp, disk_stat
 from daemon.serverResource import CPURatio
 
 
@@ -36,24 +36,6 @@ class Server_Res_Opers():
         if self.name != "":
             self.matrix_list = self.get_top_cmd_ret()
             self.id_pid_dict = self.get_container_id_pid_dict(self.name)
-
-    def retrieve_host_stat(self):
-        resource = {}
- 
-        mem_res_info = self.memory_stat()
-        resource.setdefault("mem_res", mem_res_info)
- 
-        server_disk = self.disk_stat()
-        resource.setdefault("server_disk", server_disk)
- 
-        containers = self.container_opers.get_all_containers()
-        resource.setdefault("container_number", len(containers))
- 
-        zk_opers = Common_ZkOpers()
-        host_ip = getHostIp()
-        ports = zk_opers.get_ports_from_portPool(host_ip)
-        resource.setdefault("port_number", len(ports))
-        return resource
 
     def container_count(self):
         return len(self.container_opers.get_all_containers())
@@ -91,16 +73,11 @@ class Server_Res_Opers():
         result['iops']=iops
         return result
 
-    def disk_stat(self, _path="/srv"):
+    def srv_disk_stat(self):
         """
-        just for container
+        @todo:  need to fix, make sure which path
         """
-        hd = {}
-        disk = os.statvfs(_path)
-        hd['free'] = disk.f_bsize * disk.f_bavail / (1024 * 1024)
-        hd['total'] = disk.f_bsize * disk.f_blocks / (1024 * 1024)
-        hd['used'] = hd['total'] - hd['free']
-        return hd
+        return disk_stat("/srv")
 
     def disk_loadavg(self):
         loadavg = {}
@@ -168,13 +145,19 @@ class ServerMemoryHandler(ServerResourceHandler):
         self.write_to_zookeeper("memory", memory_stat)
 
 
+"""
+    @todo: server disk
+"""
 class ServerDiskHandler(ServerResourceHandler):
 
     def gather(self):
-        disk_stat = self.server_res_opers.disk_stat()
+        disk_stat = self.server_res_opers.srv_disk_stat()
         self.write_to_zookeeper("disk", disk_stat)
 
 
+"""
+@todo: server diskio 
+"""
 class ServerDiskioHandler(ServerResourceHandler):
 
     def gather(self):

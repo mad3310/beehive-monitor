@@ -8,16 +8,14 @@ import re
 
 from docker_letv.dockerOpers import Docker_Opers
 from container.container_model import Container_Model
-from utils import calc_dir_size, get_container_type_from_container_name
+from utils import calc_dir_size, get_container_type_from_container_name, disk_stat
 from componentProxy import type_mount_map
-from resource_letv.serverResourceOpers import Server_Res_Opers
 
 
 class StateOpers(object):
 
     docker_opers = Docker_Opers()
-    serer_res_opers = Server_Res_Opers()
-
+    
     def __init__(self, container_name):
         self.container_name = container_name
         self.container_id = ''
@@ -144,7 +142,7 @@ class StateOpers(object):
         return volume_dir
 
     def get_disk_total_size(self, _path):
-        disk_stat = self.serer_res_opers.disk_stat(_path)
+        disk_stat = disk_stat(_path)
         return disk_stat.get('total')
 
     def get_sum_disk_usage(self):
