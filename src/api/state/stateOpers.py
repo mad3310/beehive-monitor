@@ -3,19 +3,20 @@ Created on Apr 5, 2015
 
 @author: root
 '''
-import os
-import commands
+
 import re
 
 from docker_letv.dockerOpers import Docker_Opers
 from container.container_model import Container_Model
 from utils import calc_dir_size, get_container_type_from_container_name
 from componentProxy import type_mount_map
+from resource_letv.serverResourceOpers import Server_Res_Opers
 
 
 class StateOpers(object):
 
     docker_opers = Docker_Opers()
+    serer_res_opers = Server_Res_Opers()
 
     def __init__(self, container_name):
         self.container_name = container_name
@@ -142,11 +143,15 @@ class StateOpers(object):
                     volume_dir = int(calc_dir_size(server_dir))
         return volume_dir
 
+    def get_disk_total_size(self, _path):
+        disk_stat = self.serer_res_opers.disk_stat(_path)
+        return disk_stat.get('total')
+
     def get_sum_disk_usage(self):
         result = {}
         
         volume_mnt_size = self.get_volume_mnt_size()
-        container_mount_diskload = calc_dir_size(self.mount_disk)
+        container_mount_diskload = self.get_disk_total_size(self.mount_disk)
         volume_ccupancy_ratio = volume_mnt_size / container_mount_diskload
         volume_ccupancy_ratio = '%s%%' % volume_ccupancy_ratio*100
         result.setdefault('volumes_mount', volume_mnt_size)

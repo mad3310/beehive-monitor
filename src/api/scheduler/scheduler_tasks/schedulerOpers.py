@@ -115,9 +115,9 @@ class SchedulerOpers(object):
         if self.valid(action_timeout):
             container_disk_usage_worker = ContainerDiskUsageWorker(
                 action_timeout)
-            container_disk_load = PeriodicCallback(
+            container_disk_usage = PeriodicCallback(
                 container_disk_usage_worker, action_timeout * 1000)
-            container_disk_load.start()
+            container_disk_usage.start()
 
     def server_resource_handler(self, action_timeout=2):
 
