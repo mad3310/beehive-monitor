@@ -32,7 +32,10 @@ class StateOpers(object):
         self.cpushares_path = '/cgroup/cpu/lxc/%s/cpu.shares' % self.container_id
         self.cpuset_path = '/cgroup/cpu/lxc/%s/cpuset.cpus' % self.container_id
         self.mount_disk = self.get_container_mount_disk()
-
+    
+    '''
+    @todo: need to add the mount list to track mulity volumns
+    '''
     def get_container_mount_disk(self):
         container_type = get_container_type_from_container_name(self.container_name)
         return type_mount_map.get(container_type)
@@ -142,7 +145,7 @@ class StateOpers(object):
                     volume_dir = int(calc_dir_size(server_dir))
         return volume_dir
 
-    def get_disk_total_size(self, _path):
+    def __get_disk_total_size(self, _path):
         disk_detail = disk_stat(_path)
         return disk_detail.get('total')
 
@@ -150,10 +153,11 @@ class StateOpers(object):
         result = {}
 
         volume_mnt_size = self.get_volume_mnt_size()
-        container_mount_diskload = self.get_disk_total_size(self.mount_disk)
+        container_mount_diskload = self.__get_disk_total_size(self.mount_disk)
         volume_ccupancy_ratio = float(volume_mnt_size) / container_mount_diskload * 100
         volume_ccupancy_ratio = '%.2f%%' % volume_ccupancy_ratio
         result.setdefault('volumes_mount', volume_mnt_size)
+        result.setdefault('volumes_total', container_mount_diskload)
         result.setdefault('volumes_ratio', volume_ccupancy_ratio)
         result.setdefault('ctime', timestamp())
         return result
