@@ -36,7 +36,7 @@ class SchedulerOpers(object):
         self.container_memory_handler(options.container_gather_duration)
         self.container_network_io_handler(options.container_gather_duration)
         self.container_disk_iops_handler(options.container_gather_duration)
-        self.container_disk_load_handler(options.container_gather_duration)
+        self.container_disk_usage_handler(options.container_gather_duration)
         self.container_oom_handler(300)
         self.server_resource_handler(options.server_gather_duration)
         
@@ -111,13 +111,13 @@ class SchedulerOpers(object):
                 container_disk_iops_worker, action_timeout * 1000)
             container_disk_iops.start()
 
-    def container_disk_load_handler(self, action_timeout=5):
+    def container_disk_usage_handler(self, action_timeout=5):
 
         if self.valid(action_timeout):
-            container_disk_load_worker = ContainerDiskLoadWorker(
+            container_disk_usage_worker = ContainerDiskUsageWorker(
                 action_timeout)
             container_disk_load = PeriodicCallback(
-                container_disk_load_worker, action_timeout * 1000)
+                container_disk_usage_worker, action_timeout * 1000)
             container_disk_load.start()
 
     def server_resource_handler(self, action_timeout=2):
@@ -138,7 +138,9 @@ class SchedulerOpers(object):
         _worker.start()
 
     def monitor_check_handler(self, action_timeout = 55):
-        
+        '''
+        @todo: need to track why use thread?
+        '''
         def __monitor_check_worker():
             monitor_check_worker = Monitor_Check_Worker(action_timeout)
             monitor_check_worker.start()

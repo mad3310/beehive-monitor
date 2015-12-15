@@ -7,11 +7,12 @@ from tornado.options import options
 
 from utils.exceptions import HTTPAPIError, UserVisiableException
 from utils.mail import send_email
-from utils.invokeCommand import InvokeCommand
 from utils import getHostIp
+
 
 import logging
 import traceback
+from common import __version__, __app__ 
 
 
 class BaseHandler(RequestHandler):
@@ -93,9 +94,8 @@ class APIHandler(BaseHandler):
 
         try:
             local_ip = getHostIp()
-            invokeCommand = InvokeCommand()
-            cmd_str = "rpm -qa container-monitor-agent"
-            version_str = invokeCommand._runSysCmd(cmd_str)
+            
+            version_str = '{0}-{1}'.format(__app__,__version__)
             logging.info("version_str :" + str(version_str))
             # send email
             subject = "[%s]Internal Server Error " % options.sitename

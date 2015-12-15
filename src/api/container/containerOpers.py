@@ -206,10 +206,8 @@ class Container_Opers(object):
         for container in containers:
             load = {}
             conl = StateOpers(container)
-            #root_mnt_size, mysql_mnt_size = conl.get_sum_disk_load()
-            root_mnt_size, _ = conl.get_sum_disk_load()
+            root_mnt_size, _ = conl.get_sum_disk_usage()
             load.setdefault('root_mount', root_mnt_size)
-            #load.setdefault('mysql_mount', mysql_mnt_size)
             result.setdefault(container, load)
         return result
 

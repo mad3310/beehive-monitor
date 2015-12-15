@@ -8,7 +8,7 @@ from tornado.web import HTTPError
 from utils.exceptions import HTTPAPIError
 from utils.threading_exception_queue import Threading_Exception_Queue
 from utils import getHostIp
-from utils.invokeCommand import InvokeCommand
+from common import __version__, __app__
 
 
 class Thread_Exception_Handler_Worker(threading.Thread):
@@ -54,9 +54,8 @@ class Thread_Exception_Handler_Worker(threading.Thread):
         try:
             # send email
             host_ip = getHostIp()
-            invokeCommand = InvokeCommand()
-            cmd_str = "rpm -qa container-monitor-agent"
-            version_str = invokeCommand._runSysCmd(cmd_str)
+            
+            version_str = '{0}-{1}'.format(__app__,__version__)
             subject = "[%s]Internal Server Error" % options.sitename
 
             exception += "\n" + version_str[0] + "\nhost ip :" + host_ip

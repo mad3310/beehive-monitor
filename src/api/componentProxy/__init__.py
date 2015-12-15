@@ -17,5 +17,6 @@ type_mount_map = {
     "jty": "/var/log",
     "gbc": "/srv",
     "cbs": "/opt/letv",
-    "lgs": "/srv"
+    "lgs": "/srv",
+    "zkp": "/srv"
 }

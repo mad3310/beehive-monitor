@@ -9,7 +9,6 @@ Created on Sep 8, 2014
 
 import os
 import logging
-import docker
 
 from tornado.options import options
 from utils.invokeCommand import InvokeCommand
@@ -25,7 +24,6 @@ class Server_Res_Opers():
     classdocs
     '''
 
-    docker_c = docker.Client(base_url='unix://var/run/docker.sock')
     _logger = logging.getLogger("process_info")
     _logger.setLevel(logging.INFO)
 

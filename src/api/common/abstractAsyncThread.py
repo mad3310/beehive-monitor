@@ -5,8 +5,8 @@ from utils.threading_exception_queue import Threading_Exception_Queue
 from utils.mail import send_email
 from utils.configFileOpers import ConfigFileOpers
 from utils import getHostIp
-from utils.invokeCommand import InvokeCommand
 from tornado.options import options
+from common import __version__, __app__
 
 
 class Abstract_Async_Thread(threading.Thread):
@@ -22,9 +22,7 @@ class Abstract_Async_Thread(threading.Thread):
         try:
             # send email
             host_ip = getHostIp()
-            invokeCommand = InvokeCommand()
-            cmd_str = "rpm -qa container-monitor-agent"
-            version_str = invokeCommand._runSysCmd(cmd_str)
+            version_str = '{0}-{1}'.format(__app__,__version__)
             subject = "[%s] %s" % (data_node_ip, text)
 
             body = "[%s] %s" % (data_node_ip, text)
