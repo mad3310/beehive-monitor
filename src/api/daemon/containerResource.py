@@ -1,9 +1,7 @@
 from appdefine.appDefine import join
 __author__ = 'mazheng'
 
-import commands
 import re
-import os
 
 from tornado.options import options
 from utils.invokeCommand import InvokeCommand
