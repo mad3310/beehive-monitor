@@ -9,7 +9,6 @@ from resource_letv.containerResourceOpers import ContainerMemoryHandler
 class ContainerMemoryWorker(BaseWorker):
 
     def __init__(self, timeout=5):
-        super(ContainerMemoryWorker, self).__init__()
         self.timeout = timeout
         self.memory_handler = ContainerMemoryHandler()
 

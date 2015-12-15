@@ -102,7 +102,7 @@ class APIHandler(BaseHandler):
             body = self.render_string("../templates/errors/500_email.html",
                                       exception=exception)
 
-            body += "\n" + version_str[0] + "\nip:" + local_ip
+            body += "\n" + version_str + "\nip:" + local_ip
 
 #            email_from = "%s <noreply@%s>" % (options.sitename, options.domain)
             if options.send_email_switch:

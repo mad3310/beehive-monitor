@@ -123,3 +123,7 @@ class Test(unittest.TestCase):
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
+
+    #suite = unittest.TestSuite()  
+    #suite.addTest(Test('test_get_sum_disk_usage')) 
+    #unittest.TextTestRunner(verbosity=1).run(suite) 

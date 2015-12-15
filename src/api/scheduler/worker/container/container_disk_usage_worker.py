@@ -9,7 +9,6 @@ from resource_letv.containerResourceOpers import ContainerDiskUsageHandler
 class ContainerDiskUsageWorker(BaseWorker):
 
     def __init__(self, timeout=5):
-        super(ContainerDiskUsageWorker, self).__init__()
         self.timeout = timeout
         self.disk_usage_handler = ContainerDiskUsageHandler()
 

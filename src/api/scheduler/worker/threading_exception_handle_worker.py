@@ -58,7 +58,7 @@ class Thread_Exception_Handler_Worker(threading.Thread):
             version_str = '{0}-{1}'.format(__app__,__version__)
             subject = "[%s]Internal Server Error" % options.sitename
 
-            exception += "\n" + version_str[0] + "\nhost ip :" + host_ip
+            exception += "\n" + version_str + "\nhost ip :" + host_ip
 
 #            body = self.render_string("errors/500_email.html", exception=exception)
 

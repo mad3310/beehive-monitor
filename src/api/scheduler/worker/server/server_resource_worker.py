@@ -9,7 +9,6 @@ from resource_letv.serverResourceOpers import ServerCPUHandler, ServerMemoryHand
 class ServerResourceWorker(BaseWorker):
 
     def __init__(self, timeout=2):
-        super(ServerResourceWorker, self).__init__()
         self.timeout = timeout
         self.cpu_handler = ServerCPUHandler()
         self.memory_handler = ServerMemoryHandler()

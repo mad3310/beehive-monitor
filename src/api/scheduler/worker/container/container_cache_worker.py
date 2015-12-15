@@ -9,7 +9,6 @@ from resource_letv.containerResourceOpers import ContainerCacheHandler
 class ContainerCacheWorker(BaseWorker):
 
     def __init__(self, timeout=5):
-        super(ContainerCacheWorker, self).__init__()
         self.timeout = timeout
         self.cache_handler = ContainerCacheHandler()
 

@@ -9,7 +9,6 @@ from resource_letv.containerResourceOpers import ContainerNetworkIOHandler
 class ContainerNetworkIOWorker(BaseWorker):
 
     def __init__(self, timeout=5):
-        super(ContainerNetworkIOWorker, self).__init__()
         self.timeout = timeout
         self.network_io = ContainerNetworkIOHandler()
 

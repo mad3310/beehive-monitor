@@ -8,9 +8,7 @@ from utils.threading_exception_queue import Threading_Exception_Queue
 class BaseWorker(object):
 
     threading_exception_queue = Threading_Exception_Queue()
-
-    def __init__(self, pool_size=2):
-        self.pool = futures.ThreadPoolExecutor(pool_size)
+    _thread_pool = futures.ThreadPoolExecutor(17)
 
     def job(self):
         raise NotImplemented("base worker job method should be implemented")
@@ -19,4 +17,4 @@ class BaseWorker(object):
         self.run()
 
     def run(self):
-        self.pool.submit(self.job)
+        self._thread_pool.submit(self.job)

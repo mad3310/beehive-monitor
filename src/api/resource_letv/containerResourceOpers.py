@@ -149,10 +149,8 @@ class ContainerDiskIOPSHandler(ContainerResourceHandler):
         for container_node in container_nodes:
             container_id = container_node.container_id
             if container_id not in self.containers_diskio:
-                container_type = get_container_type_from_container_name(
-                    container_node.container_name)
-                self.containers_diskio[container_id] = DiskIO(
-                    container_id, container_type)
+                container_type = get_container_type_from_container_name(container_node.container_name)
+                self.containers_diskio[container_id] = DiskIO(container_id, container_type)
             disk_iops = self.containers_diskio[container_id].get_result()
             self.write_to_zookeeper(
                 container_node.cluster_name, container_node.node_name, 'diskiops', disk_iops)

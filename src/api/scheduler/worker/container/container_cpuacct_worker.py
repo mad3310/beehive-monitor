@@ -9,7 +9,6 @@ from resource_letv.containerResourceOpers import ContainerCPUAcctHandler
 class ContainerCPUAcctWorker(BaseWorker):
 
     def __init__(self, timeout=5):
-        super(ContainerCPUAcctWorker, self).__init__()
         self.timeout = timeout
         self.cpuacct_handler = ContainerCPUAcctHandler()
 

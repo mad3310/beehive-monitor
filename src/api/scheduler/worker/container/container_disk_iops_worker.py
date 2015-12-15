@@ -9,7 +9,6 @@ from resource_letv.containerResourceOpers import ContainerDiskIOPSHandler
 class ContainerDiskIOPSWorker(BaseWorker):
 
     def __init__(self, timeout=5):
-        super(ContainerDiskIOPSWorker, self).__init__()
         self.timeout = timeout
         self.disk_iops_handler = ContainerDiskIOPSHandler()
 
