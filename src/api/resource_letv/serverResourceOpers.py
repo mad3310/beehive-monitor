@@ -77,7 +77,7 @@ class Server_Res_Opers():
         """
         @todo:  need to fix, make sure which path
         """
-        result = disk_stat("/srv") / (1024*1024)
+        result = disk_stat("/srv")
         return result
 
     def disk_loadavg(self):

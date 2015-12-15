@@ -17,6 +17,7 @@ ContainerNode = namedtuple(
 class ContainerCache(object):
 
     def __init__(self):
+        self.init()
         self.from_cache = set()
         self.to_cache = set()
         self.docker_op = Docker_Opers()
@@ -114,7 +115,6 @@ class ContainerResourceHandler(object):
 class ContainerCacheHandler(ContainerResourceHandler):
 
     def gather(self):
-        self.container_cache.init()
         self.container_cache.update()
 
 
