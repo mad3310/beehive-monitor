@@ -38,10 +38,10 @@ class StateOpers(object):
         return con.id()
 
     def __get_file_value(self, file_path):
-        value = ''
-        file_cmd = 'cat %s' % file_path
-        if os.path.exists(file_path):
-            value = commands.getoutput(file_cmd)
+        with open(file_path, 'r') as f:
+            value = f.read()
+            f.close()
+            
         return value
 
     def get_con_used_mem(self):
