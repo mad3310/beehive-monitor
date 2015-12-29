@@ -81,6 +81,12 @@ class GatherClusterNetworkioHandler(GatherClusterResourceHandler):
         super(GatherClusterNetworkioHandler, self).get(cluster, 'networkio')
 
 
+class GatherClusterDiskiopsHandler(GatherClusterResourceHandler):
+
+    def get(self, cluster):
+        super(GatherClusterDiskiopsHandler, self).get(cluster, 'diskiops')
+
+
 class GatherClusterDiskHandler(GatherClusterResourceHandler):
 
     def get(self, cluster):

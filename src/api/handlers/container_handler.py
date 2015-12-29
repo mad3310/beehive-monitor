@@ -37,10 +37,8 @@ class BaseContainerHandler(APIHandler):
             cluster_name, container_name)
         resource_value = zk_opers.retrieve_container_resource(
             cluster_name, node_name, resource_type)
-        current_time = get_current_time()
 
-        result.setdefault(resource_type, resource_value)
-        result.setdefault('time', current_time)
+        result.setdefault('value', resource_value)
         result.setdefault('containerName', container_name)
         return result
 

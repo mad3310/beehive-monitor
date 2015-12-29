@@ -50,7 +50,7 @@ def zk_singleton(cls):
     return _zk_singleton
 
 
-default_executor =  ThreadPoolExecutor(10)
+default_executor =  ThreadPoolExecutor(20)
 
 
 def run_on_executor(executor=default_executor):
