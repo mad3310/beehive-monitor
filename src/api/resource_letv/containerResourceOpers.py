@@ -147,6 +147,9 @@ class ContainerDiskIOPSHandler(ContainerResourceHandler):
     def gather(self):
         container_nodes = self.get_container_nodes()
         for container_node in container_nodes:
+            is_vip_node = self.con_op.is_container_vip(container_node.container_name)
+            if is_vip_node:
+                continue
             container_id = container_node.container_id
             if container_id not in self.containers_diskio:
                 container_type = get_container_type_from_container_name(container_node.container_name)

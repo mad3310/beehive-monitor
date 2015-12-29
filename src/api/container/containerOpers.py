@@ -243,3 +243,7 @@ class Container_Opers(object):
         create_info.setdefault('isUseIp', con.use_ip())
         create_info.setdefault('containerName', container_name)
         return create_info
+
+    def is_container_vip(self, container_name):
+        return 'n-4' in container_name or '_vip' in container_name
+

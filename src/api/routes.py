@@ -17,6 +17,7 @@ handlers = [
     (r"/containerCluster/stat/(.*)/memory", GatherClusterMemeoyHandler),
     (r"/containerCluster/stat/(.*)/cpuacct", GatherClusterCpuacctHandler),
     (r"/containerCluster/stat/(.*)/networkio", GatherClusterNetworkioHandler),
+    (r"/containerCluster/stat/(.*)/diskiops", GatherClusterDiskiopsHandler),
     (r"/containerCluster/stat/(.*)/disk", GatherClusterDiskHandler),
 
     (r"/container/status/(.*)", CheckContainerStatusHandler),
