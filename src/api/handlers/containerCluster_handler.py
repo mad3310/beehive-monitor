@@ -87,10 +87,10 @@ class GatherClusterDiskiopsHandler(GatherClusterResourceHandler):
         super(GatherClusterDiskiopsHandler, self).get(cluster, 'diskiops')
 
 
-class GatherClusterDiskHandler(GatherClusterResourceHandler):
+class GatherClusterDiskusageHandler(GatherClusterResourceHandler):
 
     def get(self, cluster):
-        super(GatherClusterDiskHandler, self).get(cluster, 'disk')
+        super(GatherClusterDiskusageHandler, self).get(cluster, 'diskusage')
 
 
 @require_basic_auth

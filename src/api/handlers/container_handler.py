@@ -79,10 +79,10 @@ class GatherContainerDiskIopsHandler(BaseContainerHandler):
         super(GatherContainerDiskIopsHandler, self).get(container_name, 'diskiops')
 
 
-class GatherContainerDiskLoadHandler(BaseContainerHandler):
+class GatherContainerDiskusageHandler(BaseContainerHandler):
     
     def get(self, container_name):
-        super(GatherContainerDiskLoadHandler, self).get(container_name, 'diskload')
+        super(GatherContainerDiskusageHandler, self).get(container_name, 'diskusage')
 
 
 @require_basic_auth

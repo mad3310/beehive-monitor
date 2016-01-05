@@ -18,14 +18,14 @@ handlers = [
     (r"/containerCluster/stat/(.*)/cpuacct", GatherClusterCpuacctHandler),
     (r"/containerCluster/stat/(.*)/networkio", GatherClusterNetworkioHandler),
     (r"/containerCluster/stat/(.*)/diskiops", GatherClusterDiskiopsHandler),
-    (r"/containerCluster/stat/(.*)/disk", GatherClusterDiskHandler),
+    (r"/containerCluster/stat/(.*)/diskusage", GatherClusterDiskusageHandler),
 
     (r"/container/status/(.*)", CheckContainerStatusHandler),
     (r"/container/stat/(.*)/memory", GatherContainerMemeoyHandler),
     (r"/container/stat/(.*)/cpuacct", GatherContainerCpuacctHandler),
     (r"/container/stat/(.*)/networkio", GatherContainerNetworkioHandler),
     (r"/container/stat/(.*)/diskiops", GatherContainerDiskIopsHandler),
-    (r"/container/stat/(.*)/diskload", GatherContainerDiskLoadHandler),
+    (r"/container/stat/(.*)/diskusage", GatherContainerDiskusageHandler),
     
     (r"/server/resource/(.*)/cpu", GatherServerCpuHandler),
     (r"/server/resource/(.*)/memory", GatherServerMemoryHandler),
