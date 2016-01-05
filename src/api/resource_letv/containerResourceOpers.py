@@ -171,7 +171,7 @@ class ContainerDiskUsageHandler(ContainerResourceHandler):
             node_name = self.con_op.get_container_node_from_container_name(
                         container_node.cluster_name, container_node.container_name)
             self.write_to_zookeeper(
-                container_node.cluster_name, node_name, 'diskload', disk_usage)
+                container_node.cluster_name, node_name, 'diskusage', disk_usage)
 
 
 class ContainerNetworkIOHandler(ContainerResourceHandler):
