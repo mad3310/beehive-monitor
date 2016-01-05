@@ -153,11 +153,11 @@ class StateOpers(object):
         result = {}
 
         volume_mnt_size = self.get_volume_mnt_size()
-        container_mount_diskload = self.__get_disk_total_size(self.mount_disk)
-        volume_ccupancy_ratio = float(volume_mnt_size) / container_mount_diskload * 100
+        container_mount_diskusage = self.__get_disk_total_size(self.mount_disk)
+        volume_ccupancy_ratio = float(volume_mnt_size) / container_mount_diskusage * 100
         volume_ccupancy_ratio = '%.2f%%' % volume_ccupancy_ratio
         result.setdefault('volumes_mount', volume_mnt_size)
-        result.setdefault('volumes_total', container_mount_diskload)
+        result.setdefault('volumes_total', container_mount_diskusage)
         result.setdefault('volumes_ratio', volume_ccupancy_ratio)
         result.setdefault('ctime', timestamp())
         return result

@@ -38,7 +38,8 @@ class CPURatio(ContainerResource):
     def _cal_ratio(numerator, denominator):
         if denominator == 0:
             return 0.0
-        return 1.0 * numerator / denominator
+        value = 1.0 * numerator / denominator * 100
+        return '%.3f%%' % value
 
     def statistic(self):
         
