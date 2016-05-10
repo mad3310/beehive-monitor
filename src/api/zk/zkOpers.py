@@ -324,8 +324,12 @@ class ZkOpers(object):
         path = self.rootPath + "/" + cluster_uuid + "/container/cluster/" + \
             cluster_name + "/" + container_node + "/resource/" + resource_type
         logging.debug("container resource status:" + path)
-        self.zk.ensure_path(path)
-        self.DEFAULT_RETRY_POLICY(self.zk.set, path, str(resource_value))
+        container_status_path = self.rootPath + "/" + cluster_uuid + \
+                                "/container/cluster/" + cluster_name + \
+                                "/" + container_node + "/status"
+        if self.zk.exists(container_status_path):
+            self.zk.ensure_path(path)
+            self.DEFAULT_RETRY_POLICY(self.zk.set, path, str(resource_value))
 
     '''
     ***************************************config********************************************
