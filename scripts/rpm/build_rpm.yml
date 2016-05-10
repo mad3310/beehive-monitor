@@ -1,8 +1,8 @@
 ---
 # 源码git仓库地址
-git_repo: git@git.letv.cn:dengliangju/container-monitor-agent.git
+git_repo: git@git.letv.cn:mcluster/container-monitor-agent.git
 # 获取指定分支的代码
-git_branch: develop
+git_branch: release-0.0.3
 
 # 源类型，支持："dir" "rpm" "gem" "python" "empty" "tar" "deb" "cpan" "npm"
 # "osxpkg" "pear" "pkgin" "virtualenv" "zip"
@@ -15,7 +15,7 @@ target_type: rpm
 # 软件包名
 name: container-monitor-agent
 # 软件包版本号
-version: 0.0.3
+version: 0.0.3rc1
 # 软件包安装及运行时依赖
 dependencies:
     - docker-py
