@@ -1,6 +1,6 @@
 ---
 # 源码git仓库地址
-git_repo: git@git.letv.cn:dengliangju/container-monitor-agent.git
+git_repo: git@git.letv.cn:mcluster/container-monitor-agent.git
 # 获取指定分支的代码
 git_branch: master
 
