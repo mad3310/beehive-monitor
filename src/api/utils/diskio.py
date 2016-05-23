@@ -1,10 +1,17 @@
 #!/usr/bin/env python
 # encoding: utf-8
 from collections import namedtuple
+
 import shlex
 import subprocess
 import sys
-#  import time
+
+try:
+    # for python3.2+
+    from functools import lru_cache
+except:
+    # for python3.2-
+    from utils.func_tool import lru_cache
 
 sdiskio = namedtuple('sdiskio', ['read_count', 'write_count',
                                  'read_bytes', 'write_bytes',
@@ -15,6 +22,7 @@ sdiskio = namedtuple('sdiskio', ['read_count', 'write_count',
 sdiskpart = namedtuple('sdiskpart', ['device', 'mountpoint', 'fstype', 'opts'])
 
 
+@lru_cache(maxsize=10080)
 def get_sector_size():
     try:
         with open(b"/sys/block/sda/queue/hw_sector_size") as f:
@@ -26,6 +34,7 @@ def get_sector_size():
 SECTOR_SIZE = get_sector_size()
 
 
+@lru_cache(maxsize=10080)
 def parse_lsblk():
     """通过lsblk命令获取磁盘名称、磁盘内核名称、挂载点的对应信息."""
     cmd = 'lsblk -P -o name,kname,mountpoint'
@@ -43,26 +52,28 @@ def parse_lsblk():
     return retdic
 
 
+@lru_cache(maxsize=10080)
+def get_partitions():
+    """获取所有已安装的分区, 与fdisk -l 得到的分区相同，区别是名字
+    显示的格式不同。
+    """
+    partitions = []
+    with open("/proc/partitions", "r") as f:
+        lines = f.readlines()[2:]
+    for line in reversed(lines):
+        # 存在sda-1这样带数字的分区时则忽略sda，各个子分区单独统计
+        _, _, _, name = line.split()
+        if name[-1].isdigit():
+            partitions.append(name)
+        else:
+            # 不存在sda-1这样带数字的子分区时，则获取sda整个分区
+            if not partitions or not partitions[-1].startswith(name):
+                partitions.append(name)
+    return partitions
+
+
 def stats():
     """获取系统中所有已安装磁盘的io统计情况。"""
-
-    def get_partitions():
-        """获取所有已安装的分区, 与fdisk -l 得到的分区相同，区别是名字
-        显示的格式不同。
-        """
-        partitions = []
-        with open("/proc/partitions", "r") as f:
-            lines = f.readlines()[2:]
-        for line in reversed(lines):
-            # 存在sda-1这样带数字的分区时则忽略sda，各个子分区单独统计
-            _, _, _, name = line.split()
-            if name[-1].isdigit():
-                partitions.append(name)
-            else:
-                # 不存在sda-1这样带数字的子分区时，则获取sda整个分区
-                if not partitions or not partitions[-1].startswith(name):
-                    partitions.append(name)
-        return partitions
 
     retdict = {}
     partitions = get_partitions()
@@ -101,6 +112,7 @@ def stats():
     return retdict
 
 
+@lru_cache(maxsize=10080)
 def disk_partitions(all=False):
     """返回已挂载的分区, 同df 命令看到的分区"""
     retlst = []
@@ -114,6 +126,7 @@ def disk_partitions(all=False):
     return retlst
 
 
+@lru_cache(maxsize=10080)
 def bytes2human(n):
     """
     >>> bytes2human(10000)
@@ -132,18 +145,7 @@ def bytes2human(n):
     return '%.2f B/s' % (n)
 
 
-#  def disk_iops():
-    #  disks_before = stats()
-    #  time.sleep(1)
-    #  disks_after = stats()
-    #  disks_read_per_sec = disks_after['dm-0'].read_bytes -\
-        #  disks_before['dm-0'].read_bytes
-    #  disks_write_per_sec = disks_after['dm-0'].write_bytes -\
-        #  disks_before['dm-0'].write_bytes
-    #  return disks_read_per_sec, disks_write_per_sec
-
 if __name__ == '__main__':
     print stats()
     print disk_partitions()
     print parse_lsblk()
-    #  print disk_iops()
