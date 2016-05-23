@@ -8,7 +8,7 @@ from daemonResource import DaemonResource
 from resource_letv.serverResourceOpers import Server_Res_Opers
 from utils.exceptions import UserVisiableException
 from utils import get_dev_number_by_mount_dir, timestamp
-from componentProxy import type_mount_map
+from componentProxy import component_mount_map
 from appdefine.appDefine import join
 
 
@@ -20,7 +20,8 @@ class ContainerResource(DaemonResource):
     @property
     def container_id(self):
         return self._container_id
-    
+
+
 class CPURatio(ContainerResource):
 
     server_oprs = Server_Res_Opers()
@@ -42,22 +43,22 @@ class CPURatio(ContainerResource):
         return '%.3f%%' % value
 
     def statistic(self):
-        
+
         with open(self.file, 'r') as f:
             content = f.read()
             f.close()
-            
+
         total_list = content.strip().split('\n')
         tmp_user = int(total_list[0].split()[1])
         tmp_system = int(total_list[1].split()[1])
-        
+
         if self.total_user_cpu and self.total_system_cpu:
             cpu_inc = self.server_oprs.server_cpu_ratio.cpu_inc
             self.user_cpu_ratio = self._cal_ratio(
                 tmp_user - self.total_user_cpu, cpu_inc)
             self.system_cpu_ratio = self._cal_ratio(
                 tmp_system - self.total_system_cpu, cpu_inc)
-            
+
         self.total_user_cpu = tmp_user
         self.total_system_cpu = tmp_system
 
@@ -86,19 +87,19 @@ class NetworkIO(ContainerResource):
         content = ivk_cmd._runSysCmd(cmd)[0]
         trx_list = re.findall(
             '.*pbond0\s+\d+\s+\d+\s+(\d+)\s+\d+\s+\d+\s+\d+\s+(\d+).*', content)
-        
+
         RX_SUM, TX_SUM = 0, 0
         for RX, TX in trx_list:
             RX_SUM += int(RX)
             TX_SUM += int(TX)
-            
+
         rx_sum = RX_SUM
         tx_sum = TX_SUM
-        
+
         if self._total_tx and self._total_rx:
             self._tx = tx_sum - self._total_tx
             self._rx = rx_sum - self._total_rx
-            
+
         self._total_rx = rx_sum
         self._total_tx = tx_sum
 
@@ -113,7 +114,7 @@ class NetworkIO(ContainerResource):
     def get_result(self):
         self.statistic()
         result = {
-            'ctime' : timestamp(), 
+            'ctime' : timestamp(),
             'rx' : self.rx,
             'tx' : self.tx
         }
@@ -133,7 +134,7 @@ class DiskIO(ContainerResource):
         self._total_write_bytes = 0
 
     def get_mount_dir_by_container_type(self, container_type):
-        return type_mount_map.get(container_type, "/srv")
+        return component_mount_map.get(container_type, "/srv")
 
 
     @property
@@ -154,22 +155,22 @@ class DiskIO(ContainerResource):
         _file = self.file % self._container_id
         if not re.match("\d+\:\d+", self.dev_number):
             raise UserVisiableException('get device number wrong :%s' % self.dev_number)
-        
+
         with open(_file, 'r') as f:
             content = f.read()
             f.close()
-        
+
         _read,  _write= 0, 0
         if self.dev_number in content:
             _read = re.findall('%s Read (\d+ ?)' % self.dev_number, content)[0]
             _read = int(_read)
             _write = re.findall('%s Write (\d+ ?)' % self.dev_number, content)[0]
             _write = int(_write)
-        
+
         if self._total_read_bytes and self._total_write_bytes:
             self._read_iops = (_read - self._total_read_bytes)/options.container_gather_duration
             self._write_iops = (_write - self._total_write_bytes)/options.container_gather_duration
-            
+
         self._total_read_bytes = _read
         self._total_write_bytes = _write
 

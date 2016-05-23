@@ -10,7 +10,7 @@ _path = {
 }
 
 
-type_mount_map = {
+component_mount_map = {
     "ngx": "/var/log",
     "mcl": "/srv/docker/vfs",
     "gbl": "/srv",
