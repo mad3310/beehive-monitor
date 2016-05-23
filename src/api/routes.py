@@ -26,10 +26,11 @@ handlers = [
     (r"/container/stat/(.*)/networkio", GatherContainerNetworkioHandler),
     (r"/container/stat/(.*)/diskiops", GatherContainerDiskIopsHandler),
     (r"/container/stat/(.*)/diskusage", GatherContainerDiskusageHandler),
-    
+
     (r"/server/resource/(.*)/cpu", GatherServerCpuHandler),
     (r"/server/resource/(.*)/memory", GatherServerMemoryHandler),
     (r"/server/resource/(.*)/disk", GatherServerDiskHandler),
-    
+    (r"/server/resource/(.*)/diskiops", GatherServerDiskiopsHandler),
+
     (r"/monitor/status", ContainerStatus),
 ]
