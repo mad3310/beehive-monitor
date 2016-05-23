@@ -38,7 +38,7 @@ class GatherClusterResourceHandler(APIHandler):
 
         container_node_list = zkOper.retrieve_container_list(cluster)
         result = []
-        
+
         for container_node in container_node_list:
             resource = {}
             resource_value = zkOper.retrieve_container_resource(cluster, container_node, resource_type)
@@ -99,7 +99,7 @@ class CheckContainerClusterStatusHandler(APIHandler):
     classdocs
     '''
     containerClusterOpers = ContainerCluster_Opers()
-    
+
     @asynchronous
     @engine
     def get(self, cluster):
@@ -120,14 +120,14 @@ class CheckClusterSyncHandler(APIHandler):
     """
 
     container_cluster_opers = ContainerCluster_Opers()
-    
+
     @asynchronous
     @engine
     def get(self):
         """ # eg. curl --user root:root -X GET
             # http://10.154.156.150:6666/containerCluster/sync
         """
-        
+
         result = yield self.do()
         ret = {}
         ret.setdefault('data', result)
@@ -137,5 +137,3 @@ class CheckClusterSyncHandler(APIHandler):
     @run_callback
     def do(self):
         return self.container_cluster_opers.sync()
-
-

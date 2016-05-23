@@ -514,7 +514,7 @@ class ZkOpers(object):
         logging.debug(data)
 
         resultValue = {}
-        if data != None and data != '':
+        if data:
             resultValue = eval(data)
         return resultValue
 
@@ -527,9 +527,7 @@ class ZkOpers(object):
         self.zk.ensure_path(self.rootPath)
         clusters = self.DEFAULT_RETRY_POLICY(
             self.zk.get_children, self.rootPath)
-        if len(clusters) != 0:
-            return True
-        return False
+        return len(clusters)>0
 
 
 @zk_singleton
