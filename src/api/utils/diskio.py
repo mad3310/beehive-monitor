@@ -126,7 +126,6 @@ def disk_partitions(all=False):
     return retlst
 
 
-@lru_cache(maxsize=10080)
 def bytes2human(n):
     """
     >>> bytes2human(10000)
