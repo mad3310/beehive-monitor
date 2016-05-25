@@ -5,13 +5,14 @@ from collections import namedtuple
 import shlex
 import subprocess
 import sys
+import time
 
 try:
     # for python3.2+
     from functools import lru_cache
 except:
     # for python3.2-
-    from utils.func_tool import lru_cache
+    from func_tool import lru_cache
 
 sdiskio = namedtuple('sdiskio', ['read_count', 'write_count',
                                  'read_bytes', 'write_bytes',
@@ -144,7 +145,45 @@ def bytes2human(n):
     return '%.2f B/s' % (n)
 
 
+def iops(mountpoints):
+    interval = 1
+    disks_before = stats()
+    time.sleep(interval)
+    disks_after = stats()
+    retdic = {}
+
+    def _get_partition_io(pname):
+        read_per_sec = float(disks_after[pname].read_bytes -
+                             disks_before[pname].read_bytes) / interval
+        write_per_sec = float(disks_after[pname].write_bytes -
+                              disks_before[pname].write_bytes) / interval
+        return read_per_sec, write_per_sec
+
+    partitions = parse_lsblk()
+    # 根据挂载点获取磁盘内核名称
+    parts = []
+    for p in partitions:
+        if partitions[p]['mountpoint'] in mountpoints:
+            parts.append(partitions[p]['kname'])
+    if parts:
+        reads_total = 0
+        writes_total = 0
+        for p in parts:
+            read_per_sec, write_per_sec = _get_partition_io(p)
+            reads_total += read_per_sec
+            writes_total += write_per_sec
+        read_for_human = bytes2human(reads_total)
+        write_for_human = bytes2human(writes_total)
+        retdic = {'read_iops': reads_total,
+                  'write_iops': writes_total,
+                  'read_iops_human': read_for_human,
+                  'write_iops_human': write_for_human}
+    return retdic
+
+
 if __name__ == '__main__':
-    print stats()
-    print disk_partitions()
-    print parse_lsblk()
+    #  print stats()
+    #  print disk_partitions()
+    #  print parse_lsblk()
+    mountpoints = ('/', '[SWAP]')
+    print iops(mountpoints)

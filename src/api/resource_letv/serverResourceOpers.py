@@ -8,7 +8,6 @@ Created on Sep 8, 2014
 '''
 
 import logging
-import time
 
 from tornado.options import options
 
@@ -24,6 +23,7 @@ from zk.zkOpers import Common_ZkOpers, Scheduler_ZkOpers
 
 class Server_Res_Opers():
     '''
+    # TODO: 资源采集与写入分离，规划好接口， 重构一下?
     classdocs
     '''
 
@@ -62,30 +62,9 @@ class Server_Res_Opers():
         return stat
 
     def disk_iops(self):
-        disks_before = diskio.stats()
-        time.sleep(1)
-        disks_after = diskio.stats()
-        retdic = {}
-        # mcluster组件所在的挂载点
-        # TODO: 只获取mcluster组件的磁盘io而不是该服务器的所有磁盘io吗？
-        mountponit = component_mount_map.get('mcl', '/srv/docker/vfs')
-        partitions = diskio.parse_lsblk()
-        # 根据挂载点获取磁盘内核名称
-        part = None
-        for p in partitions:
-            if p.get('mountpoint', '') == mountponit:
-                part = p.get('kname')
-                break
-        if part:
-            disks_read_per_sec = disks_after[part].read_bytes - \
-                disks_before[part].read_bytes
-            disks_write_per_sec = disks_after[part].write_bytes - \
-                disks_before[part].write_bytes
-            io_read_for_human = diskio.bytes2human(disks_read_per_sec)
-            io_write_for_human = diskio.bytes2human(disks_write_per_sec)
-            retdic = {'read_iops': io_read_for_human,
-                      'write_iops': io_write_for_human}
-        return retdic
+        mountpoints = ('/srv/docker/vfs', '/srv')
+        result = diskio.iops(mountpoints)
+        return result
 
     def srv_disk_stat(self):
         """
