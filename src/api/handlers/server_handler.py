@@ -21,7 +21,8 @@ class ServerResHandler(APIHandler):
         exist = self.server_opers.host_exist(host_ip)
         if not exist:
             error_message = 'server %s not exist, please check your server ip' % host_ip
-            raise HTTPAPIError(status_code=417, error_detail=error_message,
+            raise HTTPAPIError(status_code=417,
+                               error_detail=error_message,
                                notification="direct",
                                log_message=error_message,
                                response=error_message)
@@ -64,3 +65,8 @@ class GatherServerDiskHandler(ServerResHandler):
     def get(self, host_ip):
         super(GatherServerDiskHandler, self).get(host_ip, 'disk')
 
+
+class GatherServerDiskiopsHandler(ServerResHandler):
+
+    def get(self, host_ip):
+        super(GatherServerDiskiopsHandler, self).get(host_ip, 'diskiops')
