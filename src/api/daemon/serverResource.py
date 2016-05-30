@@ -7,8 +7,8 @@ from daemonResource import DaemonResource
 class ServerResource(DaemonResource):
 
     '''TODO'''
-    
-    
+
+
 class CPURatio(ServerResource):
 
     def __init__(self):

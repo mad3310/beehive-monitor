@@ -9,13 +9,13 @@ import re
 from docker_letv.dockerOpers import Docker_Opers
 from container.container_model import Container_Model
 from utils import calc_dir_size, get_container_type_from_container_name, disk_stat, timestamp
-from componentProxy import type_mount_map
+from componentProxy import component_mount_map
 
 
 class StateOpers(object):
 
     docker_opers = Docker_Opers()
-    
+
     def __init__(self, container_name):
         self.container_name = container_name
         self.container_id = ''
@@ -32,13 +32,13 @@ class StateOpers(object):
         self.cpushares_path = '/cgroup/cpu/lxc/%s/cpu.shares' % self.container_id
         self.cpuset_path = '/cgroup/cpu/lxc/%s/cpuset.cpus' % self.container_id
         self.mount_disk = self.get_container_mount_disk()
-    
+
     '''
     @todo: need to add the mount list to track mulity volumns
     '''
     def get_container_mount_disk(self):
         container_type = get_container_type_from_container_name(self.container_name)
-        return type_mount_map.get(container_type)
+        return component_mount_map.get(container_type)
 
     def get_container_id(self):
         _inspect = self.docker_opers.inspect_container(self.container_name)
@@ -49,7 +49,7 @@ class StateOpers(object):
         with open(file_path, 'r') as f:
             value = f.read()
             f.close()
-            
+
         return value
 
     def get_con_used_mem(self):
@@ -135,7 +135,7 @@ class StateOpers(object):
         return calc_dir_size(self.root_mnt_path)
 
     def get_volume_mnt_size(self):
-        volume_dir = 0 
+        volume_dir = 0
         _inspect = self.docker_opers.inspect_container(self.container_name)
         con = Container_Model(_inspect)
         volumes = con.inspect_volumes()

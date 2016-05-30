@@ -12,28 +12,28 @@ from zk.zkOpers import Scheduler_ZkOpers
 
 
 class Monitor_Check_Worker(Abstract_Async_Thread):
-    
+
     server_res_handler = ServerResCheckcHandler()
     container_res_handler = ContainerResCheckHandler()
     beehive_check_handler = BeehiveCheckHandler()
-    
+
     def __init__(self, timeout=55):
         self.timeout = timeout
-        super(Monitor_Check_Worker,self).__init__()
+        super(Monitor_Check_Worker, self).__init__()
 
     def run(self):
         isLock, lock = False, None
-        
+
         zkOper = Scheduler_ZkOpers()
         try:
             isLock, lock = zkOper.lock_async_monitor_action()
         except kazoo.exceptions.LockTimeout:
             logging.info("a thread is running the monitor async, give up this oper on this machine!")
             return
-        
+
         if not isLock:
             return
-        
+
         try:
             begin_time = time.time()
             logging.info("do monitor work every five minutes")

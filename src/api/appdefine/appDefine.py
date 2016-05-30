@@ -15,9 +15,9 @@ define('domain', default="letv.com", help='domain name')
 
 define('send_email_switch', default=True, type=bool,
        help='the flag of if send error email')
-define('admins', default=("zhangzeng <zhangzeng@letv.com>", 
-                          "zhoubingzheng <zhoubingzheng@letv.com>",
-                          "liujinliu <liujinliu@le.com>",),
+define('admins', default=("zhoubingzheng <zhoubingzheng@letv.com>",
+                          "liujinliu <liujinliu@le.com>",
+                          "dengliangju <dengliangju@le.com>",),
        help='admin email address')
 define('smtp_host', default="10.205.91.22", help='smtp host')
 define('smtp_port', default=587, help='smtp port')
