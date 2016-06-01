@@ -7,21 +7,24 @@ Created on Sep 8, 2014
 @author: Wangzhen
 '''
 
-import os
 import logging
 import re
 
 from tornado.options import options
-from utils.invokeCommand import InvokeCommand
-from docker_letv.dockerOpers import Docker_Opers
+
+from componentProxy import component_mount_map
 from container.containerOpers import Container_Opers
-from zk.zkOpers import Common_ZkOpers, Scheduler_ZkOpers
-from utils import getHostIp, disk_stat
 from daemon.serverResource import CPURatio
+from docker_letv.dockerOpers import Docker_Opers
+from utils import diskio
+from utils.invokeCommand import InvokeCommand
+from utils import getHostIp, disk_stat
+from zk.zkOpers import Common_ZkOpers, Scheduler_ZkOpers
 
 
 class Server_Res_Opers():
     '''
+    # TODO: 资源采集与写入分离，规划好接口， 重构一下?
     classdocs
     '''
 
@@ -64,19 +67,9 @@ class Server_Res_Opers():
                            mem['Cached']) / (1024 * 1024)
         return stat
 
-    def disk_io(self):
-        result={}
-        iops={}
-        ivk_cmd=InvokeCommand()
-        cmd = "sh %s %s" % (options.disk_io_sh,"/srv/docker/vfs")
-        content=ivk_cmd._runSysCmd(cmd)[0]
-        iopses=content.split()
-        if len(iopses)==2:
-            iops['read']=float(iopses[0])
-            iops['write']=float(iopses[1])
-        else:
-            iops['read']=iops['write']=0
-        result['iops']=iops
+    def disk_iops(self):
+        mountpoints = ('/srv/docker/vfs', '/srv')
+        result = diskio.iops(mountpoints)
         return result
 
     def srv_disk_stat(self):
@@ -162,14 +155,11 @@ class ServerDiskHandler(ServerResourceHandler):
         self.write_to_zookeeper("disk", disk_stat)
 
 
-"""
-@todo: server diskio 
-"""
-class ServerDiskioHandler(ServerResourceHandler):
+class ServerDiskiopsHandler(ServerResourceHandler):
 
     def gather(self):
-        disk_stat = self.server_res_opers.disk_io()
-        self.write_to_zookeeper("diskio", disk_stat)
+        disk_iops = self.server_res_opers.disk_iops()
+        self.write_to_zookeeper("diskiops", disk_iops)
 
 
 class ContainerCountHandler(ServerResourceHandler):
