@@ -29,7 +29,7 @@ handlers = [
 
     (r"/server/resource/(.*)/cpu", GatherServerCpuHandler),
     (r"/server/resource/(.*)/memory", GatherServerMemoryHandler),
-    (r"/server/resource/(.*)/disk", GatherServerDiskHandler),
+    (r"/server/resource/(.*)/diskusage", GatherServerDiskusageHandler),
     (r"/server/resource/(.*)/diskiops", GatherServerDiskiopsHandler),
 
     (r"/monitor/status", ContainerStatus),

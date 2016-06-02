@@ -60,10 +60,10 @@ class GatherServerMemoryHandler(ServerResHandler):
         super(GatherServerMemoryHandler, self).get(host_ip, 'memory')
 
 
-class GatherServerDiskHandler(ServerResHandler):
+class GatherServerDiskusageHandler(ServerResHandler):
 
     def get(self, host_ip):
-        super(GatherServerDiskHandler, self).get(host_ip, 'disk')
+        super(GatherServerDiskusageHandler, self).get(host_ip, 'diskusage')
 
 
 class GatherServerDiskiopsHandler(ServerResHandler):

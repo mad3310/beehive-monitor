@@ -68,9 +68,9 @@ class Server_Res_Opers():
 
     def srv_disk_stat(self):
         """
-        @todo:  need to fix, make sure which path
+        @todo:  监控所有磁盘和分区
         """
-        result = disk_stat("/srv")
+        result = disk_stat('/srv/docker/vfs')
         return result
 
     def disk_loadavg(self):
@@ -142,11 +142,11 @@ class ServerMemoryHandler(ServerResourceHandler):
 """
     @todo: server disk
 """
-class ServerDiskHandler(ServerResourceHandler):
+class ServerDiskusageHandler(ServerResourceHandler):
 
     def gather(self):
         disk_stat = self.server_res_opers.srv_disk_stat()
-        self.write_to_zookeeper("disk", disk_stat)
+        self.write_to_zookeeper("diskusage", disk_stat)
 
 
 class ServerDiskiopsHandler(ServerResourceHandler):

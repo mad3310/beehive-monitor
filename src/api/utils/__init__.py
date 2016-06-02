@@ -147,7 +147,7 @@ def get_current_time():
 
 
 def _get_property_dict(class_model_obj):
-    """use this method temporarily, later add to class Container_Model   
+    """use this method temporarily, later add to class Container_Model
     """
     result = {}
     for _property, value in class_model_obj.__dict__.items():
@@ -336,12 +336,12 @@ def get_dev_number_by_mount_dir(mount_dir):
     content = get_file_data('/etc/fstab')
     device_path = re.findall('(\/dev.*?)\s+%s' % mount_dir, content)[0]
     device_path = os.path.realpath(device_path)
-    
+
     parent_device = device_path.split('/')[-1]
-    
+
     if not parent_device.startswith('dm'):
         parent_device = re.sub('\d+', '', parent_device)
-    
+
     dev_num_path = r'/sys/class/block/%s/dev'  % parent_device
     dev_num = get_file_data(dev_num_path)
     return dev_num.strip()
@@ -355,7 +355,7 @@ def _walk_dir(file_path, file_list=[]):
         except UnicodeDecodeError:
             continue
         islink = os.path.islink(path_name)
-        is_exists =  os.path.exists(path_name)   
+        is_exists =  os.path.exists(path_name)
         if not islink and is_exists:
             mode = os.stat(path_name).st_mode
             if S_ISDIR(mode):
@@ -382,7 +382,7 @@ def calc_dir_size(file_path):
 
 
 def disk_stat(_path):
-    
+
     hd = {}
     disk = os.statvfs(_path)
     hd['free'] = disk.f_bsize * disk.f_bavail
@@ -399,4 +399,4 @@ def check_server_on_zk():
     zk_port = confDict.get('zkPort')
     zk_addr = confDict.get('zkAddress')
     return zk_addr and zk_port
-    
+
