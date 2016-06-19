@@ -16,16 +16,16 @@ TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 
 class CheckStatusBase(object):
-    
+
     def __init__(self):
         if self.__class__ == CheckStatusBase:
             raise NotImplementedError, \
             "Cannot create object of class CheckStatusBase"
-    
+
     @abstractmethod
     def check(self, data_node_info_list):
         raise NotImplementedError, "Cannot call abstract method"
-    
+
     @abstractmethod
     def retrieve_alarm_level(self, total_count, success_count, failed_count):
         raise NotImplementedError, "Cannot call abstract method"
@@ -41,10 +41,10 @@ class CheckStatusBase(object):
         result_dict.setdefault("alarm", alarm_level)
         result_dict.setdefault("error_record", error_record)
         result_dict.setdefault("ctime", dt.strftime(TIME_FORMAT))
-        
+
         logging.info("monitor_type:" + monitor_type + " monitor_key:" + \
                      monitor_key + " monitor_value:" + str(result_dict))
-        
+
         zkOper = Scheduler_ZkOpers()
         zkOper.write_monitor_status(monitor_type, monitor_key, result_dict)
 
@@ -60,9 +60,9 @@ class CheckResIpNum(CheckStatusBase):
             error_record = 'the number of ips in ip Pool is %s, please add ips!' % success_count
         alarm_level = self.retrieve_alarm_level(0, success_count, 0)
         super(CheckResIpNum, self).write_status(0, success_count, 0, \
-                                                alarm_level, error_record, 
+                                                alarm_level, error_record,
                                                 monitor_type, monitor_key)
-        
+
 
     def retrieve_alarm_level(self, total_count, success_count, failed_count):
         if 20 < success_count:
@@ -79,19 +79,19 @@ class CheckServerPortNum(CheckStatusBase):
     def check(self):
 
         monitor_type, monitor_key, error_record = 'res', 'port_num', ''
-        
+
         zk_opers = Scheduler_ZkOpers()
         host_ip_list = zk_opers.retrieve_data_node_list()
         for host_ip in host_ip_list:
             success_count = self.port_opers.get_port_num(host_ip)
             if success_count < 30:
                 error_record += 'the number of port in port Pool is %s on server :%s, please add ports!\n' % (success_count, host_ip)
-        
+
         alarm_level = self.retrieve_alarm_level(0, success_count, 0)
         super(CheckServerPortNum, self).write_status(0, 0, 0, \
-                                                     alarm_level, error_record, 
+                                                     alarm_level, error_record,
                                                      monitor_type, monitor_key)
-    
+
     def retrieve_alarm_level(self, total_count, success_count, failed_count):
         if 30 < success_count:
             return options.alarm_nothing
@@ -102,9 +102,9 @@ class CheckServerPortNum(CheckStatusBase):
 
 
 class CheckResIpLegality(CheckStatusBase):
-    
+
     ip_opers = IpOpers()
-    
+
     def check(self):
         monitor_type, monitor_key = 'res', 'ip_usable'
 
@@ -112,13 +112,13 @@ class CheckResIpLegality(CheckStatusBase):
         error_record = self.ip_opers.get_illegal_ips(10)
         failed_count = len(error_record)
         logging.info('check ip res result, such ips can be pingable : %s' % failed_count)
-        
+
         alarm_level = self.retrieve_alarm_level(0, 0, failed_count)
         super(CheckResIpLegality, self).write_status(0, 0, \
                                                     failed_count, \
                                                     alarm_level, error_record, monitor_type, \
                                                     monitor_key)
-        
+
     def retrieve_alarm_level(self, total_count, success_count, failed_count):
         if failed_count == 0:
             return options.alarm_nothing
@@ -129,23 +129,23 @@ class CheckResIpLegality(CheckStatusBase):
 class CheckServerDiskUsage(CheckStatusBase):
 
     def check(self):
-        monitor_type, monitor_key = 'server', 'disk'        
-        zk_opers = Scheduler_ZkOpers()        
+        monitor_type, monitor_key = 'server', 'diskusage'
+        zk_opers = Scheduler_ZkOpers()
 
-        host_ip_list = zk_opers.retrieve_data_node_list()        
+        host_ip_list = zk_opers.retrieve_data_node_list()
         if not host_ip_list:
             return
-        
+
         error_record, host_disk = [], {}
-        
-        for host_ip in host_ip_list:                
-            host_disk = zk_opers.retrieve_server_resource(host_ip, monitor_key)           
-            if host_disk["used"] > host_disk["total"]*0.8:                    
+
+        for host_ip in host_ip_list:
+            host_disk = zk_opers.retrieve_server_resource(host_ip, monitor_key)
+            if host_disk["used"] > host_disk["total"]*0.8:
                 error_record.append('%s' % host_ip)
 
         alarm_level = self.retrieve_alarm_level(len(host_ip_list), len(host_ip_list)-len(error_record), len(error_record))
         error_message = "disk capacity utilization rate is greater than 70% !"
-        super(CheckServerDiskUsage, self).write_status(len(host_ip_list), len(host_ip_list)-len(error_record), len(error_record), 
+        super(CheckServerDiskUsage, self).write_status(len(host_ip_list), len(host_ip_list)-len(error_record), len(error_record),
                                                   alarm_level, error_record, monitor_type, monitor_key, error_message)
 
     def retrieve_alarm_level(self, total_count, used_count, free_count):
@@ -161,7 +161,7 @@ class CheckServerDiskIO(CheckStatusBase):
     """
     @todo:  retrieveDataNodeServerResource change to retrieve_server_resource
     """
-    
+
     def check(self):
         monitor_type, monitor_key = 'server', 'disk_io'
         zk_opers = Scheduler_ZkOpers()
@@ -198,22 +198,22 @@ class CheckServerDiskIO(CheckStatusBase):
 class CheckResMemory(CheckStatusBase):
 
     def check(self):
-        monitor_type, monitor_key = 'server', 'memory'        
-        zk_opers = Scheduler_ZkOpers()        
+        monitor_type, monitor_key = 'server', 'memory'
+        zk_opers = Scheduler_ZkOpers()
 
-        host_ip_list = zk_opers.retrieve_data_node_list()        
+        host_ip_list = zk_opers.retrieve_data_node_list()
         if not host_ip_list:
             return
-        
+
         server_node_value = zk_opers.retrieve_monitor_server_value()
         logging.info('monitor server resource threshold:%s' % str(server_node_value))
         memory_threshold = server_node_value.get('memory_threshold')
         memory_threshold_m = memory_threshold/1024/1024
-        
+
         error_record, host_mem = [], {}
         for host_ip in host_ip_list:
-            host_mem = zk_opers.retrieve_server_resource(host_ip, monitor_key)           
-            if host_mem["free"] < memory_threshold_m:                    
+            host_mem = zk_opers.retrieve_server_resource(host_ip, monitor_key)
+            if host_mem["free"] < memory_threshold_m:
                 error_record.append('%s' % host_ip)
 
         alarm_level = self.retrieve_alarm_level(len(host_ip_list), len(host_ip_list)-len(error_record), len(error_record))
@@ -230,18 +230,18 @@ class CheckResMemory(CheckStatusBase):
 
 
 class CheckContainersKeyValue(CheckStatusBase):
-    
+
     server_opers = Server_Opers()
-    
+
     def __init__(self, monitor_key, value):
         super(CheckContainersKeyValue, self).__init__()
         self.monitor_key = monitor_key
         self.value = value
-    
+
     def check(self):
         monitor_type,  error_record = 'container', []
         failed_count = 0
-        
+
         logging.info('do check under_oom')
         zk_opers = Scheduler_ZkOpers()
 
@@ -260,7 +260,7 @@ class CheckContainersKeyValue(CheckStatusBase):
                     failed_count = len(error_record)
 
         alarm_level = self.retrieve_alarm_level(0, 0, failed_count)
-        self.write_status(0, 0, failed_count, alarm_level, error_record, monitor_type, self.monitor_key)      
+        self.write_status(0, 0, failed_count, alarm_level, error_record, monitor_type, self.monitor_key)
 
     def retrieve_alarm_level(self, total_count, success_count, failed_count):
         if failed_count == 0:
@@ -270,13 +270,13 @@ class CheckContainersKeyValue(CheckStatusBase):
 
 
 class CheckContainersUnderOom(CheckContainersKeyValue):
-    
+
     def __init__(self):
         super(CheckContainersUnderOom, self).__init__('under_oom', 0)
 
 
 class CheckContainersOomKillDisable(CheckContainersKeyValue):
-    
+
     def __init__(self):
         super(CheckContainersOomKillDisable, self).__init__('oom_kill_disable', 1)
 
@@ -295,10 +295,10 @@ class CheckBeehiveAlived(CheckStatusBase):
             if not beehive_ret:
                 alarm_level = options.alarm_serious
                 error_record += 'server:%s , beehive service is not running, please check!;' % host_ip
-            
+
             monitor_ret = nc_ip_port_available(host_ip, monitor_port)
             if not monitor_ret:
                 alarm_level = options.alarm_serious
                 error_record += 'server:%s , container-monitor-agent service is not running, please check!;' % host_ip
-                
+
         super(CheckBeehiveAlived, self).write_status(0, 0, 0, alarm_level, error_record, monitor_type, monitor_key)
