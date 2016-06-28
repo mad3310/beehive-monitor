@@ -108,7 +108,7 @@ class ServerResourceHandler(object):
         zk_op.write_server_resource(self.ip, tp, value)
 
     def write_to_es(self, resource_type, doc, es=es_test_cluster):
-        _now = datetime.now()
+        _now = datetime.utcnow()
         _date = _now.strftime('%Y%m%d')
         _index = "monitor_server_resource_{0}_{1}".format(resource_type, _date)
         doc.update({
