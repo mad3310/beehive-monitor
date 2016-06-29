@@ -39,7 +39,7 @@ start () {
 	touch $PIDFILE
 	chown $USER:$GROUP $PIDFILE
 
-	MMCMD="python2.6 /opt/letv/container-monitor-agent/api/containerMonitorAgent.pyc >>$CONSOLELOG 2>&1 & 	\
+	MMCMD="python2.6 /opt/letv/container-monitor-agent/container_monitor/containerMonitorAgent.pyc >>$CONSOLELOG 2>&1 & 	\
 		echo "'$! >'"$PIDFILE"
 
         echo -n $"Starting ${NAME}:"
