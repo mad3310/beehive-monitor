@@ -5,7 +5,7 @@ import sys
 from scheduler.worker.base_worker import BaseWorker
 from resource_letv.serverResourceOpers import (ServerCPUHandler,
                                                ServerMemoryHandler,
-                                               ServerDiskHandler,
+                                               ServerDiskusageHandler,
                                                ContainerCountHandler,
                                                ServerDiskiopsHandler)
 
@@ -16,7 +16,7 @@ class ServerResourceWorker(BaseWorker):
         self.timeout = timeout
         self.cpu_handler = ServerCPUHandler()
         self.memory_handler = ServerMemoryHandler()
-        self.disk_handler = ServerDiskHandler()
+        self.diskusage_handler = ServerDiskusageHandler()
         self.diskiops_handler = ServerDiskiopsHandler()
         self.container_count_handler = ContainerCountHandler()
 
@@ -29,6 +29,6 @@ class ServerResourceWorker(BaseWorker):
     def _write_server_resource(self):
         self.cpu_handler.gather()
         self.memory_handler.gather()
-        self.disk_handler.gather()
+        self.diskusage_handler.gather()
         self.container_count_handler.gather()
         self.diskiops_handler.gather()
