@@ -6,7 +6,7 @@ Created on Sep 8, 2014
 
 @author: Wangzhen
 '''
-
+from datetime import datetime
 import logging
 
 from tornado.options import options
@@ -18,6 +18,7 @@ from docker_letv.dockerOpers import Docker_Opers
 from utils import diskio
 from utils.invokeCommand import InvokeCommand
 from utils import getHostIp, disk_stat
+from utils.es_utils import es_test_cluster
 from zk.zkOpers import Common_ZkOpers, Scheduler_ZkOpers
 
 
@@ -86,24 +87,6 @@ class Server_Res_Opers():
         self._logger.info("disk io information: " + str(loadavg))
         return loadavg
 
-#     def cpu_info(self):
-#         cpu = []
-#         cpuinfo = {}
-#         f = open("/proc/cpuinfo", "r")
-#         lines = f.readlines()
-#         f.close()
-#         for line in lines:
-#             if line == '\n':
-#                 cpu.append(cpuinfo)
-#                 cpuinfo = {}
-#             if len(line) < 2:
-#                 continue
-#             name = line.split(':')[0].rstrip()
-#             var = line.split(':')[1].rstrip()
-#             cpuinfo[name] = var
-#         #self._logger.info("cpu information :" + str(cpu))
-#         return cpu
-
     def cpu_ratio(self):
         return self._server_cpu_ratio.get_result()
 
@@ -124,12 +107,23 @@ class ServerResourceHandler(object):
         zk_op = Scheduler_ZkOpers()
         zk_op.write_server_resource(self.ip, tp, value)
 
+    def write_to_es(self, resource_type, doc, es=es_test_cluster):
+        _now = datetime.utcnow()
+        _date = _now.strftime('%Y%m%d')
+        _index = "monitor_server_resource_{0}_{1}".format(resource_type, _date)
+        doc.update({
+            'ip': self.ip,
+            'timestamp': _now
+        })
+        res = es.index(index=_index, doc_type=resource_type, body=doc)
+
 
 class ServerCPUHandler(ServerResourceHandler):
 
     def gather(self):
         cpu_ratio = self.server_res_opers.cpu_ratio()
         self.write_to_zookeeper("cpu", cpu_ratio)
+        self.write_to_es("cpu", cpu_ratio)
 
 
 class ServerMemoryHandler(ServerResourceHandler):
@@ -137,6 +131,7 @@ class ServerMemoryHandler(ServerResourceHandler):
     def gather(self):
         memory_stat = self.server_res_opers.memory_stat()
         self.write_to_zookeeper("memory", memory_stat)
+        self.write_to_es("memory", memory_stat)
 
 
 """
@@ -147,6 +142,7 @@ class ServerDiskusageHandler(ServerResourceHandler):
     def gather(self):
         disk_stat = self.server_res_opers.srv_disk_stat()
         self.write_to_zookeeper("diskusage", disk_stat)
+        self.write_to_es("diskusage", disk_stat)
 
 
 class ServerDiskiopsHandler(ServerResourceHandler):
@@ -154,6 +150,7 @@ class ServerDiskiopsHandler(ServerResourceHandler):
     def gather(self):
         disk_iops = self.server_res_opers.disk_iops()
         self.write_to_zookeeper("diskiops", disk_iops)
+        self.write_to_es("diskiops", disk_iops)
 
 
 class ContainerCountHandler(ServerResourceHandler):
@@ -161,3 +158,4 @@ class ContainerCountHandler(ServerResourceHandler):
     def gather(self):
         container_count = self.server_res_opers.container_count()
         self.write_to_zookeeper("container_count", container_count)
+        self.write_to_es("container_count", {'container_count': container_count})
