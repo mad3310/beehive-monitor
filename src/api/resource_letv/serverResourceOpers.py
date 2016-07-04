@@ -44,11 +44,6 @@ class Server_Res_Opers():
     def container_count(self):
         return len(self.container_opers.get_all_containers())
 
-    def vip_container_count(self):
-        return len(
-             filter(lambda x: re.match(r'([\w\W]*)_vip-n-([0-9]*$)', x),
-                    self.container_opers.get_all_containers()))
-
     def memory_stat(self):
         mem, stat = {}, {}
         f = open("/proc/meminfo", "r")
@@ -166,7 +161,5 @@ class ContainerCountHandler(ServerResourceHandler):
 
     def gather(self):
         container_count = self.server_res_opers.container_count()
-        vip_container_count = self.server_res_opers.vip_container_count()
         self.write_to_zookeeper("container_count", container_count)
-        self.write_to_zookeeper("vip_container_count", vip_container_count)
 
