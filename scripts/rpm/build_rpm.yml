@@ -1,6 +1,6 @@
 ---
 # 源码git仓库地址
-git_repo: git@git.letv.cn:dengliangju/container-monitor-agent.git
+git_repo: git@git.letv.cn:mcluster/container-monitor-agent.git
 
 # 源类型，支持："dir" "rpm" "gem" "python" "empty" "tar" "deb" "cpan" "npm"
 # "osxpkg" "pear" "pkgin" "virtualenv" "zip"
