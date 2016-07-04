@@ -8,7 +8,6 @@ Created on Sep 8, 2014
 '''
 
 import logging
-import re
 
 from tornado.options import options
 
