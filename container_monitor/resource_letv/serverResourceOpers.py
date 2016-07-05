@@ -18,7 +18,7 @@ from docker_letv.dockerOpers import Docker_Opers
 from utils import diskio
 from utils.invokeCommand import InvokeCommand
 from utils import getHostIp, disk_stat
-from utils.es_utils import es_test_cluster
+from utils.es_utils import es_test_cluster as es_cluster
 from zk.zkOpers import Common_ZkOpers, Scheduler_ZkOpers
 
 
@@ -103,11 +103,7 @@ class ServerResourceHandler(object):
     def gather(self):
         raise NotImplementedError("the gather method must be implemented")
 
-    def write_to_zookeeper(self, tp, value):
-        zk_op = Scheduler_ZkOpers()
-        zk_op.write_server_resource(self.ip, tp, value)
-
-    def write_to_es(self, resource_type, doc, es=es_test_cluster):
+    def write_to_es(self, resource_type, doc, es=es_cluster):
         _now = datetime.utcnow()
         _date = _now.strftime('%Y%m%d')
         _index = "monitor_server_resource_{0}_{1}".format(resource_type, _date)
@@ -122,7 +118,6 @@ class ServerCPUHandler(ServerResourceHandler):
 
     def gather(self):
         cpu_ratio = self.server_res_opers.cpu_ratio()
-        self.write_to_zookeeper("cpu", cpu_ratio)
         self.write_to_es("cpu", cpu_ratio)
 
 
@@ -130,7 +125,6 @@ class ServerMemoryHandler(ServerResourceHandler):
 
     def gather(self):
         memory_stat = self.server_res_opers.memory_stat()
-        self.write_to_zookeeper("memory", memory_stat)
         self.write_to_es("memory", memory_stat)
 
 
@@ -141,7 +135,6 @@ class ServerDiskusageHandler(ServerResourceHandler):
 
     def gather(self):
         disk_stat = self.server_res_opers.srv_disk_stat()
-        self.write_to_zookeeper("diskusage", disk_stat)
         self.write_to_es("diskusage", disk_stat)
 
 
@@ -149,7 +142,6 @@ class ServerDiskiopsHandler(ServerResourceHandler):
 
     def gather(self):
         disk_iops = self.server_res_opers.disk_iops()
-        self.write_to_zookeeper("diskiops", disk_iops)
         self.write_to_es("diskiops", disk_iops)
 
 
@@ -157,5 +149,4 @@ class ContainerCountHandler(ServerResourceHandler):
 
     def gather(self):
         container_count = self.server_res_opers.container_count()
-        self.write_to_zookeeper("container_count", container_count)
         self.write_to_es("container_count", {'container_count': container_count})

@@ -3,5 +3,5 @@
 
 """
 
-__version__ = '0.0.6a2'
+__version__ = '0.0.6'
 __app__ = 'container-monitor-agent'
