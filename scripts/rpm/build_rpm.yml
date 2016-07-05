@@ -23,6 +23,7 @@ dependencies:
     - python-simplejson
     - python-tornado
     - python-websockify
+    - python-elasticsearch
     - zope.interface
 
 # 安装位置，无需再写软件包名. 已默认安装至 /opt/letv
