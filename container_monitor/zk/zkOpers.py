@@ -311,14 +311,6 @@ class ZkOpers(object):
         resultValue = self._retrieveSpecialPathProp(path)
         return resultValue
 
-    def write_server_resource(self, host_ip, resource_type, resource_value):
-        cluster_uuid = self.getClusterUUID()
-        path = self.rootPath + "/" + cluster_uuid + \
-            "/dataNode/" + host_ip + "/resource/" + resource_type
-        logging.debug("server resource status:" + path)
-        self.zk.ensure_path(path)
-        self.DEFAULT_RETRY_POLICY(self.zk.set, path, str(resource_value))
-
     def write_container_resource(self, cluster_name, container_node, resource_type, resource_value):
         cluster_uuid = self.getClusterUUID()
         path = self.rootPath + "/" + cluster_uuid + "/container/cluster/" + \
