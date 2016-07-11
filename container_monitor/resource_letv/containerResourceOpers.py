@@ -1,12 +1,14 @@
 __author__ = 'mazheng'
 
 from collections import namedtuple
+from datetime import datetime
 
 from container.containerOpers import Container_Opers
 from docker_letv.dockerOpers import Docker_Opers
 from zk.zkOpers import Scheduler_ZkOpers
 from state.stateOpers import StateOpers
 from utils import get_containerClusterName_from_containerName, get_container_type_from_container_name
+from utils.es_utils import es_test_cluster as es_cluster
 from daemon.containerResource import NetworkIO, DiskIO, CPURatio
 
 
@@ -104,6 +106,15 @@ class ContainerResourceHandler(object):
         zk_op.write_container_resource(
             cluster_name, container_node, resource_type, resource_value)
 
+    def write_to_es(self, resource_type, doc, es=es_cluster):
+        _now = datetime.utcnow()
+        _date = _now.strftime('%Y%m%d')
+        _index = "monitor_container_resource_{0}_{1}".format(resource_type, _date)
+        doc.update({
+            'timestamp': _now
+        })
+        res = es.index(index=_index, doc_type=resource_type, body=doc)
+
     def gather(self):
         raise NotImplemented("this gather method should be implemented")
 
@@ -118,6 +129,7 @@ class ContainerCPUAcctHandler(ContainerResourceHandler):
 
     def gather(self):
         container_nodes = self.get_container_nodes()
+        res_type = 'cpuacct'
         for container_node in container_nodes:
             container_id = container_node.container_id
             if container_id not in self.containers_cpuratio:
@@ -126,26 +138,38 @@ class ContainerCPUAcctHandler(ContainerResourceHandler):
             node_name = self.con_op.get_container_node_from_container_name(
                         container_node.cluster_name, container_node.container_name)
             self.write_to_zookeeper(
-                container_node.cluster_name, node_name, 'cpuacct', cpu_ratio)
+                container_node.cluster_name, node_name, res_type, cpu_ratio)
+            _doc = cpu_ratio.update({
+                'cluster_name': container_node.cluster_name,
+                'node_name': node_name
+            })
+            self.write_to_es(res_type, _doc)
 
 
 class ContainerMemoryHandler(ContainerResourceHandler):
 
     def gather(self):
         container_nodes = self.get_container_nodes()
+        res_type = 'memory'
         for container_node in container_nodes:
             state_op = StateOpers(container_node.container_name)
             memory = state_op.get_memory_stat_item()
             node_name = self.con_op.get_container_node_from_container_name(
                         container_node.cluster_name, container_node.container_name)
             self.write_to_zookeeper(
-                container_node.cluster_name, node_name, 'memory', memory)
+                container_node.cluster_name, node_name, res_type, memory)
+            _doc = memory.update({
+                'cluster_name': container_node.cluster_name,
+                'node_name': node_name
+            })
+            self.write_to_es(res_type, _doc)
 
 
 class ContainerDiskIOPSHandler(ContainerResourceHandler):
 
     def gather(self):
         container_nodes = self.get_container_nodes()
+        res_type = 'diskiops'
         for container_node in container_nodes:
             is_vip_node = self.con_op.is_container_vip(container_node.container_name)
             if is_vip_node:
@@ -158,26 +182,38 @@ class ContainerDiskIOPSHandler(ContainerResourceHandler):
             node_name = self.con_op.get_container_node_from_container_name(
                         container_node.cluster_name, container_node.container_name)
             self.write_to_zookeeper(
-                container_node.cluster_name, node_name, 'diskiops', disk_iops)
+                container_node.cluster_name, node_name, res_type, disk_iops)
+            _doc = disk_iops.update({
+                'cluster_name': container_node.cluster_name,
+                'node_name': node_name
+            })
+            self.write_to_es(res_type, _doc)
 
 
 class ContainerDiskUsageHandler(ContainerResourceHandler):
 
     def gather(self):
         container_nodes = self.get_container_nodes()
+        res_type = 'diskusage'
         for container_node in container_nodes:
             state_op = StateOpers(container_node.container_name)
             disk_usage = state_op.get_sum_disk_usage()
             node_name = self.con_op.get_container_node_from_container_name(
                         container_node.cluster_name, container_node.container_name)
             self.write_to_zookeeper(
-                container_node.cluster_name, node_name, 'diskusage', disk_usage)
+                container_node.cluster_name, node_name, res_type, disk_usage)
+            _doc = disk_usage.update({
+                'cluster_name': container_node.cluster_name,
+                'node_name': node_name
+            })
+            self.write_to_es(res_type, _doc)
 
 
 class ContainerNetworkIOHandler(ContainerResourceHandler):
 
     def gather(self):
         container_nodes = self.get_container_nodes()
+        res_type = 'networkio'
         for container_node in container_nodes:
             container_id = container_node.container_id
             if container_id not in self.containers_networkio:
@@ -187,4 +223,9 @@ class ContainerNetworkIOHandler(ContainerResourceHandler):
             node_name = self.con_op.get_container_node_from_container_name(
                         container_node.cluster_name, container_node.container_name)
             self.write_to_zookeeper(
-                container_node.cluster_name, node_name, 'networkio', network_io)
+                container_node.cluster_name, node_name, res_type, network_io)
+            _doc = network_io.update({
+                'cluster_name': container_node.cluster_name,
+                'node_name': node_name
+            })
+            self.write_to_es(res_type, _doc)
