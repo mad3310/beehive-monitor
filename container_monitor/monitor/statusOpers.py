@@ -140,19 +140,16 @@ class CheckServerDiskUsage(CheckStatusBase):
 
         for host_ip in host_ip_list:
             host_disk = zk_opers.retrieve_server_resource(host_ip, monitor_key)
-            if host_disk["used"] > host_disk["total"]*0.8:
+            if host_disk["used"] > host_disk["total"]*0.85:
                 error_record.append('%s' % host_ip)
 
         alarm_level = self.retrieve_alarm_level(len(host_ip_list), len(host_ip_list)-len(error_record), len(error_record))
-        error_message = "disk capacity utilization rate is greater than 70% !"
+        error_message = "disk capacity utilization rate is greater than 85% !"
         super(CheckServerDiskUsage, self).write_status(len(host_ip_list), len(host_ip_list)-len(error_record), len(error_record),
                                                   alarm_level, error_record, monitor_type, monitor_key, error_message)
 
-    def retrieve_alarm_level(self, total_count, used_count, free_count):
-        if free_count == 0:
-            return options.alarm_nothing
-        else:
-            return options.alarm_serious
+    def retrieve_alarm_level(self, total_count, normal_count, overload_count):
+        return options.alarm_general if overload_count else options.alarm_nothing
 
 
 class CheckServerDiskIO(CheckStatusBase):
