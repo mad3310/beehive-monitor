@@ -139,11 +139,11 @@ class ContainerCPUAcctHandler(ContainerResourceHandler):
                         container_node.cluster_name, container_node.container_name)
             self.write_to_zookeeper(
                 container_node.cluster_name, node_name, res_type, cpu_ratio)
-            _doc = cpu_ratio.update({
+            cpu_ratio.update({
                 'cluster_name': container_node.cluster_name,
                 'node_name': node_name
             })
-            self.write_to_es(res_type, _doc)
+            self.write_to_es(res_type, cpu_ratio)
 
 
 class ContainerMemoryHandler(ContainerResourceHandler):
@@ -158,11 +158,11 @@ class ContainerMemoryHandler(ContainerResourceHandler):
                         container_node.cluster_name, container_node.container_name)
             self.write_to_zookeeper(
                 container_node.cluster_name, node_name, res_type, memory)
-            _doc = memory.update({
+            memory.update({
                 'cluster_name': container_node.cluster_name,
                 'node_name': node_name
             })
-            self.write_to_es(res_type, _doc)
+            self.write_to_es(res_type, memory)
 
 
 class ContainerDiskIOPSHandler(ContainerResourceHandler):
@@ -183,11 +183,11 @@ class ContainerDiskIOPSHandler(ContainerResourceHandler):
                         container_node.cluster_name, container_node.container_name)
             self.write_to_zookeeper(
                 container_node.cluster_name, node_name, res_type, disk_iops)
-            _doc = disk_iops.update({
+            disk_iops.update({
                 'cluster_name': container_node.cluster_name,
                 'node_name': node_name
             })
-            self.write_to_es(res_type, _doc)
+            self.write_to_es(res_type, disk_iops)
 
 
 class ContainerDiskUsageHandler(ContainerResourceHandler):
@@ -224,8 +224,8 @@ class ContainerNetworkIOHandler(ContainerResourceHandler):
                         container_node.cluster_name, container_node.container_name)
             self.write_to_zookeeper(
                 container_node.cluster_name, node_name, res_type, network_io)
-            _doc = network_io.update({
+            network_io.update({
                 'cluster_name': container_node.cluster_name,
                 'node_name': node_name
             })
-            self.write_to_es(res_type, _doc)
+            self.write_to_es(res_type, network_io)
