@@ -1,15 +1,7 @@
-__author__ = 'mazheng'
-
 from utils.invokeCommand import InvokeCommand
-from daemonResource import DaemonResource
 
 
-class ServerResource(DaemonResource):
-
-    '''TODO'''
-
-
-class CPURatio(ServerResource):
+class CPURatio(object):
 
     def __init__(self):
         self.file = "/proc/stat"
@@ -34,9 +26,10 @@ class CPURatio(ServerResource):
 
     @staticmethod
     def _cal_ratio(numerator, denominator):
-        if denominator == 0:
-            return 0.0
-        return 1.0 * numerator / denominator
+        result = 0.0
+        if denominator > 0:
+            result = float(numerator) / float(denominator)
+        return result
 
     def statistic(self):
         ivk_cmd = InvokeCommand()

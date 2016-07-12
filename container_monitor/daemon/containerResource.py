@@ -4,7 +4,6 @@ import re
 
 from tornado.options import options
 from utils.invokeCommand import InvokeCommand
-from daemonResource import DaemonResource
 from resource_letv.serverResourceOpers import Server_Res_Opers
 from utils.exceptions import UserVisiableException
 from utils import get_dev_number_by_mount_dir, timestamp
@@ -12,7 +11,7 @@ from componentProxy import component_mount_map
 from appdefine.appDefine import join
 
 
-class ContainerResource(DaemonResource):
+class ContainerResource(object):
 
     def __init__(self, container_id):
         self._container_id = container_id
@@ -37,9 +36,10 @@ class CPURatio(ContainerResource):
 
     @staticmethod
     def _cal_ratio(numerator, denominator):
-        if denominator == 0:
-            return 0.0
-        return 1.0 * numerator / denominator
+        result = 0.0
+        if denominator > 0:
+            result = float(numerator) / float(denominator)
+        return result
 
     def statistic(self):
 
@@ -63,10 +63,12 @@ class CPURatio(ContainerResource):
 
     def get_result(self):
         self.statistic()
-        result = {}
-        result['total'] = {"user": self.user_cpu_ratio,
-                           "system": self.system_cpu_ratio}
-        result.setdefault('ctime', timestamp())
+        result = {
+            'total': {
+                "user": self.user_cpu_ratio,
+                "system": self.system_cpu_ratio
+            }
+        }
         return result
 
 
