@@ -202,11 +202,11 @@ class ContainerDiskUsageHandler(ContainerResourceHandler):
                         container_node.cluster_name, container_node.container_name)
             self.write_to_zookeeper(
                 container_node.cluster_name, node_name, res_type, disk_usage)
-            _doc = disk_usage.update({
+            disk_usage.update({
                 'cluster_name': container_node.cluster_name,
                 'node_name': node_name
             })
-            self.write_to_es(res_type, _doc)
+            self.write_to_es(res_type, disk_usage)
 
 
 class ContainerNetworkIOHandler(ContainerResourceHandler):
