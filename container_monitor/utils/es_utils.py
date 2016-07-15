@@ -16,5 +16,6 @@ es_test_cluster = Elasticsearch(
     ES_TEST_CLUSTER_HOSTS,
     sniff_on_start=False,
     sniff_on_connection_fail=True,
-    sniffer_timeout=60
+    sniffer_timeout=60,
+    sniff_timeout=1,
 )
