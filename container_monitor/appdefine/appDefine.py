@@ -44,7 +44,7 @@ define("container_gather_duration", default=50,
 define("server_gather_duration", default=50,
        help="server gather resource duration")
 
-define("nsenter", default='nsenter --target `docker inspect -f "{{.State.Pid}}" %s` --mount --uts --ipc --net --pid -- ', 
+define("nsenter", default='nsenter --target `docker inspect -f "{{.State.Pid}}" %s` --mount --uts --ipc --net --pid -- ',
        help="default test cluster network interface card")
 
 define("container_rootfs_size", default=10737418240, help="container default rootfs size")

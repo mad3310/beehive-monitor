@@ -55,11 +55,11 @@ class Server_Res_Opers():
             name = line.split(':')[0]
             var = line.split(':')[1].split()[0]
             mem[name] = long(var) * 1024.0
-        stat['total'] = int(mem['MemTotal'] / (1024 * 1024))
+        stat['total'] = int(mem['MemTotal'])
         stat['used'] = int(mem['MemTotal'] - mem['MemFree'] -
-                           mem['Buffers'] - mem['Cached']) / (1024 * 1024)
+                           mem['Buffers'] - mem['Cached'])
         stat['free'] = int(mem['MemFree'] + mem['Buffers'] +
-                           mem['Cached']) / (1024 * 1024)
+                           mem['Cached'])
         return stat
 
     def disk_iops(self):
