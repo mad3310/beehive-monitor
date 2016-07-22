@@ -92,13 +92,13 @@ class StateOpers(object):
             mem_stat_dict.setdefault('ctime', timestamp())
             if 'total_rss' in item:
                 total_rss = item.split(' ')[1]
-                mem_stat_dict.setdefault('total_rss', total_rss)
+                mem_stat_dict.setdefault('total_rss', int(total_rss))
             elif 'total_swap ' in item:
                 total_swap = item.split(' ')[1]
-                mem_stat_dict.setdefault('total_swap', total_swap)
+                mem_stat_dict.setdefault('total_swap', int(total_swap))
             elif 'total_cache ' in item:
                 total_cache = item.split(' ')[1]
-                mem_stat_dict.setdefault('total_cache', total_cache)
+                mem_stat_dict.setdefault('total_cache', int(total_cache))
         return mem_stat_dict
 
     def get_oom_kill_disable_value(self):
