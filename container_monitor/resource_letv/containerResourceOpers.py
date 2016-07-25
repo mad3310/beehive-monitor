@@ -101,11 +101,6 @@ class ContainerResourceHandler(object):
 
         return container_nodes
 
-    def write_to_zookeeper(self, cluster_name, container_node, resource_type, resource_value):
-        zk_op = Scheduler_ZkOpers()
-        zk_op.write_container_resource(
-            cluster_name, container_node, resource_type, resource_value)
-
     def write_to_es(self, resource_type, doc, es=es_cluster):
         _now = datetime.utcnow()
         _date = _now.strftime('%Y%m%d')
@@ -137,8 +132,6 @@ class ContainerCPUAcctHandler(ContainerResourceHandler):
             cpu_ratio = self.containers_cpuratio[container_id].get_result()
             node_name = self.con_op.get_container_node_from_container_name(
                         container_node.cluster_name, container_node.container_name)
-            self.write_to_zookeeper(
-                container_node.cluster_name, node_name, res_type, cpu_ratio)
             cpu_ratio.update({
                 'cluster_name': container_node.cluster_name,
                 'node_name': node_name
@@ -156,8 +149,6 @@ class ContainerMemoryHandler(ContainerResourceHandler):
             memory = state_op.get_memory_stat_item()
             node_name = self.con_op.get_container_node_from_container_name(
                         container_node.cluster_name, container_node.container_name)
-            self.write_to_zookeeper(
-                container_node.cluster_name, node_name, res_type, memory)
             memory.update({
                 'cluster_name': container_node.cluster_name,
                 'node_name': node_name
@@ -181,8 +172,6 @@ class ContainerDiskIOPSHandler(ContainerResourceHandler):
             disk_iops = self.containers_diskio[container_id].get_result()
             node_name = self.con_op.get_container_node_from_container_name(
                         container_node.cluster_name, container_node.container_name)
-            self.write_to_zookeeper(
-                container_node.cluster_name, node_name, res_type, disk_iops)
             disk_iops.update({
                 'cluster_name': container_node.cluster_name,
                 'node_name': node_name
@@ -200,8 +189,6 @@ class ContainerDiskUsageHandler(ContainerResourceHandler):
             disk_usage = state_op.get_sum_disk_usage()
             node_name = self.con_op.get_container_node_from_container_name(
                         container_node.cluster_name, container_node.container_name)
-            self.write_to_zookeeper(
-                container_node.cluster_name, node_name, res_type, disk_usage)
             disk_usage.update({
                 'cluster_name': container_node.cluster_name,
                 'node_name': node_name
@@ -222,8 +209,6 @@ class ContainerNetworkIOHandler(ContainerResourceHandler):
             network_io = self.containers_networkio[container_id].get_result()
             node_name = self.con_op.get_container_node_from_container_name(
                         container_node.cluster_name, container_node.container_name)
-            self.write_to_zookeeper(
-                container_node.cluster_name, node_name, res_type, network_io)
             network_io.update({
                 'cluster_name': container_node.cluster_name,
                 'node_name': node_name
