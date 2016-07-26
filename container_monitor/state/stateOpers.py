@@ -89,16 +89,9 @@ class StateOpers(object):
         mem_stat_dict = {}
         mem_stat_items = self.get_memory_stat_value_list()
         for item in mem_stat_items:
-            mem_stat_dict.setdefault('ctime', timestamp())
-            if 'total_rss' in item:
-                total_rss = item.split(' ')[1]
-                mem_stat_dict.setdefault('total_rss', int(total_rss))
-            elif 'total_swap ' in item:
-                total_swap = item.split(' ')[1]
-                mem_stat_dict.setdefault('total_swap', int(total_swap))
-            elif 'total_cache ' in item:
-                total_cache = item.split(' ')[1]
-                mem_stat_dict.setdefault('total_cache', int(total_cache))
+            k, v = item.split()
+            mem_stat_dict.setdefault(k, int(v))
+        mem_stat_dict.setdefault('timestamp', timestamp())
         return mem_stat_dict
 
     def get_oom_kill_disable_value(self):
@@ -159,5 +152,5 @@ class StateOpers(object):
         result.setdefault('volumes_mount', volume_mnt_size)
         result.setdefault('volumes_total', container_mount_diskusage)
         result.setdefault('volumes_ratio', volume_ccupancy_ratio)
-        result.setdefault('ctime', timestamp())
+        result.setdefault('timestamp', timestamp())
         return result
