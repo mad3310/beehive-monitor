@@ -390,8 +390,8 @@ def disk_stat(_path):
     hd['used'] = hd['total'] - hd['free']
     return hd
 
-def timestamp(style = '%Y-%m-%d %H:%M:%S'):
-    return time.strftime(style, time.localtime())
+def timestamp():
+    return datetime.datetime.utcnow()
 
 
 def check_server_on_zk():
