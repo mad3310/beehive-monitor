@@ -12,7 +12,7 @@ target_type: rpm
 
 # 软件包名
 name: container-monitor-agent
-version: 0.0.6
+version: 0.0.6a1
 
 # 软件包安装及运行时依赖
 dependencies:
