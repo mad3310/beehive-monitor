@@ -49,7 +49,6 @@ class StateOpers(object):
         with open(file_path, 'r') as f:
             value = f.read()
             f.close()
-
         return value
 
     def get_con_used_mem(self):
@@ -69,12 +68,6 @@ class StateOpers(object):
         under_oom_value = re.findall('.*under_oom (\d)$', value)[0]
         return int(under_oom_value)
 
-    def get_memory_stat_value_list(self):
-        value = self.__get_file_value(self.memory_stat_path)
-        if value:
-            return value.split('\n')
-        return []
-
     def get_cpuacct_stat_value(self):
         value = self.__get_file_value(self.cpuacct_stat_path)
         return value.split('\n')
@@ -87,9 +80,10 @@ class StateOpers(object):
 
     def get_memory_stat_item(self):
         mem_stat_dict = {}
-        mem_stat_items = self.get_memory_stat_value_list()
+        with open(self.memory_stat_path, 'r') as f:
+            mem_stat_items = f.readlines()
         for item in mem_stat_items:
-            k, v = item.split()
+            k, v = item.strip().split()
             mem_stat_dict.setdefault(k, int(v))
         mem_stat_dict.setdefault('timestamp', timestamp())
         return mem_stat_dict
