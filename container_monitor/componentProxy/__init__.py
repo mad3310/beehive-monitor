@@ -17,6 +17,8 @@ component_mount_map = {
     "jty": "/var/log",
     "gbc": "/srv",
     "cbs": "/opt/letv",
-    "lgs": "/srv",
-    "zkp": "/srv"
+    "lgs": "/var/log",
+    "zkp": "/srv",
+    "kbn": "/var/log",
+    "esh": "/srv/docker/vfs",
 }
