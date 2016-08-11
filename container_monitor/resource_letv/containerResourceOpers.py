@@ -98,7 +98,7 @@ class ContainerResourceHandler(object):
 class ContainerCacheHandler(ContainerResourceHandler):
 
     def gather(self):
-        self.container_cache.refresh()
+        self.con_cache.refresh()
 
 
 class ContainerCPUAcctHandler(ContainerResourceHandler):
