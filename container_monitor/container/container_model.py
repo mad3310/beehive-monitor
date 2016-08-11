@@ -270,11 +270,7 @@ class Container_Model(object):
         return create_info
 
     def use_ip(self):
-        is_use_ip = False
-        _ip = self.ip()
-        if _ip:
-            is_use_ip = True
-        return is_use_ip
+        return True if self.ip() else False
 
     def inspect_component_type(self):
         '''

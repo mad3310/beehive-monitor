@@ -1,3 +1,4 @@
+# coding:utf-8
 __author__ = 'mazheng'
 
 from collections import namedtuple
@@ -12,94 +13,74 @@ from utils.es_utils import es_test_cluster as es_cluster
 from daemon.containerResource import NetworkIO, DiskIO, CPURatio
 
 
-ContainerNode = namedtuple(
-    'ContainerNode', ['cluster_name', 'container_name', 'container_id'])
+class ContainerCache(dict):
+    """
+    加此Cache是为了避免资源采集任务频繁调用docker-py的接口从宿主机获取容器信息，
+    由于决定一个容器是否需要采集有前置检查条件，前置检查需要连接zookeeper等开销
+    较大的操作，借助此Cache可避免对检查过的容器进行再次检查。
+    """
+    __current_ids = set()
+    old_ids = set()
+    docker_op = Docker_Opers()
+    Detail = namedtuple(
+        'Detail', ['cluster_name', 'container_name', 'container_id'])
 
+    def put(self, detail):
+        self[detail.container_id] = detail
 
-class ContainerCache(object):
-
-    def __init__(self):
-        self.from_cache = set()
-        self.to_cache = set()
-        self.docker_op = Docker_Opers()
-        self.db = {}
-        self.init()
-
-    def init(self):
-        current_container_ids = self.current_container_ids
-        self.from_cache.update(current_container_ids)
-        self.to_cache.update(current_container_ids)
-
-    def get_container_detail_by_id(self, container_id):
-        return self.db.get(container_id)
+    def find_detail_by_id(self, container_id):
+        return self.get(container_id)
 
     @property
-    def current_container_ids(self, is_all=False):
-        containers_list = []
-        containers = self.docker_op.containers(is_all)
-        for container in containers:
-            container_id = container.get('Id').replace('/', '')
-            container_name = container.get('Names')[0].replace('/', '')
-            cluster_name = get_containerClusterName_from_containerName(container_name)
-            containers_list.append(container_id)
-            self.db.update({container_id: ContainerNode._make(
-                (cluster_name, container_name, container_id))})
-        return containers_list
+    def current_ids(self):
+        if not self.__current_ids:
+            self.refresh()
+        return self.__current_ids
 
-    @property
-    def new_container_ids(self):
-        return self.from_cache - self.to_cache
-
-    def update(self):
-        self.update_from_cache()
-        self.update_to_cache()
-
-    def update_from_cache(self):
-        self.from_cache = set()
-        self.from_cache.update(self.current_container_ids)
-
-    def update_to_cache(self):
-        self.to_cache = self.to_cache - (self.to_cache - self.from_cache)
-
-    def add_valid_id(self, container_id):
-        self.to_cache.add(container_id)
-
-    @property
-    def current_valid_ids(self):
-        return self.to_cache
+    def refresh(self):
+        self.old_ids = self.__current_ids
+        self.__current_ids.clear()
+        containers =  self.docker_op.containers()
+        for c in containers:
+            con_id = c.get('Id')
+            # e.g. u'Names': [u'/d-esh-23_6_dwl_010-n-1']
+            con_name = c.get('Names', ['/NoName'])[0][1:]
+            clu_name = get_containerClusterName_from_containerName(con_name)
+            self.__current_ids.add(con_id)
+            self.put(self.Detail(clu_name, con_name, con_id))
 
 
 class ContainerResourceHandler(object):
 
     con_op = Container_Opers()
-
-    container_cache = ContainerCache()
-
+    con_cache = ContainerCache()
     containers_diskio = {}
     containers_networkio = {}
     containers_cpuratio = {}
 
-
-    def add_container_node_condition(self, container_node_detail):
+    def check_container_node_condition(self, container_node_detail):
         is_cluster_start = self.con_op.cluster_start(container_node_detail.cluster_name)
         is_container_name_legal = self.con_op.check_container_name_legal(container_node_detail.container_name)
         return container_node_detail and is_cluster_start and is_container_name_legal
 
     def get_container_nodes(self):
-        container_nodes = []
-        for container_id in self.container_cache.current_valid_ids:
-            container_node_detail = self.container_cache.get_container_detail_by_id(
-                container_id)
-            container_nodes.append(container_node_detail)
-
-        for container_id in self.container_cache.new_container_ids:
-            container_node_detail = self.container_cache.get_container_detail_by_id(
-                container_id)
-            if self.add_container_node_condition(container_node_detail):
-                self.container_cache.add_valid_id(container_id)
-                container_nodes.append(container_node_detail)
-
-        return container_nodes
+        """
+        获取需要资源采集的容器信息。此处曾可能导致内存溢出，张增排查后并未
+        改进代码。现移除原来的局部变量 container_nodes = [], 换用yield。
+        """
+        for con_id in self.con_cache.current_ids:
+            detail = self.con_cache.find_detail_by_id(con_id)
+            # 若当前id不在上一次缓存列表中, 则进行检查
+            # 否则在上一次缓存中，表示上一次已经检查过了
+            # 此次不再进行检查，降低连接zookeeper等消耗
+            if con_id not in self.con_cache.old_ids:
+                # 则进行采集前置条件检查
+                check_passed = self.check_container_node_condition(detail)
+                # 若检查不通过, 将容器信息置为 None
+                if not check_passed:
+                    detail = None
+            if detail is not None:
+                yield detail
 
     def write_to_es(self, resource_type, doc, es=es_cluster):
         _now = datetime.utcnow()
@@ -117,7 +98,7 @@ class ContainerResourceHandler(object):
 class ContainerCacheHandler(ContainerResourceHandler):
 
     def gather(self):
-        self.container_cache.update()
+        self.container_cache.refresh()
 
 
 class ContainerCPUAcctHandler(ContainerResourceHandler):
