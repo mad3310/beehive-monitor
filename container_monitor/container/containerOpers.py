@@ -93,6 +93,7 @@ class Container_Opers(object):
         return cluster_info.get('start_flag', 'failed') == 'succeed'
 
     def check_container_name_legal(self, container_name):
+        # TODO：此正则需修正，例如"d-esh///@@@-23_6_dwl_010-n-11" 也能匹配成功
         matched = re.match('^d-\w+.*-n-\d', container_name)
         return matched is not None
 
@@ -229,14 +230,14 @@ class Container_Opers(object):
 
     def container_info(self, container_name, _type=None):
         """get container node info
-        
+
         """
         create_info = {}
         _inspect = self.docker_opers.inspect_container(container_name)
         con = Container_Model(_inspect)
         if not _type:
             _type = con.inspect_component_type()
-        
+
         create_info.setdefault('type', _type)
         create_info.setdefault('hostIp', getHostIp())
         create_info.setdefault('inspect', con.inspect)

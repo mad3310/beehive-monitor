@@ -30,10 +30,10 @@ class SchedulerOpers(object):
     def __init__(self):
 
         self.thread_exception_hanlder(10)
-        
+
         if check_server_on_zk():
-            self.container_cache_handler(20)
-    
+            self.container_cache_handler(10)
+
             """ gather"""
             self.container_cpuacct_handler(options.container_gather_duration)
             self.container_memory_handler(options.container_gather_duration)
@@ -42,7 +42,7 @@ class SchedulerOpers(object):
             self.container_disk_usage_handler(10800)
             self.container_oom_handler(300)
             self.server_resource_handler(options.server_gather_duration)
-            
+
             """ check """
             self.check_ip_legality_handler(300)
             self.monitor_check_handler(55)
@@ -52,11 +52,11 @@ class SchedulerOpers(object):
         return timeout > 0
 
     def container_oom_handler(self, action_timeout):
-        
+
         def __container_oom_handler():
             _woker = Containers_Oom_Worker(action_timeout)
             _woker.start()
-            
+
         _worker = PeriodicCallback(__container_oom_handler, action_timeout * 1000)
         _worker.start()
 
@@ -130,11 +130,11 @@ class SchedulerOpers(object):
             _server_resource_async_t.start()
 
     def check_ip_legality_handler(self, action_timeout):
-        
+
         def __check_ip_legality_woker():
             check_ip_legality_worker = Check_Ip_Legality_Worker(action_timeout)
             check_ip_legality_worker.start()
-            
+
         _worker = PeriodicCallback(__check_ip_legality_woker, action_timeout * 1000)
         _worker.start()
 
@@ -145,7 +145,7 @@ class SchedulerOpers(object):
         def __monitor_check_worker():
             monitor_check_worker = Monitor_Check_Worker(action_timeout)
             monitor_check_worker.start()
-        
+
         if self.valid(action_timeout):
             _monitor_async_t = PeriodicCallback(__monitor_check_worker, action_timeout * 1000)
             _monitor_async_t.start()

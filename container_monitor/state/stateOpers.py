@@ -5,10 +5,12 @@ Created on Apr 5, 2015
 '''
 
 import re
+import logging
 
 from docker_letv.dockerOpers import Docker_Opers
 from container.container_model import Container_Model
-from utils import calc_dir_size, get_container_type_from_container_name, disk_stat, timestamp
+from utils import (calc_dir_size, get_container_type_from_container_name,
+                   disk_stat, timestamp, open_with_error)
 from componentProxy import component_mount_map
 
 
@@ -46,10 +48,13 @@ class StateOpers(object):
         return con.id()
 
     def __get_file_value(self, file_path):
-        with open(file_path, 'r') as f:
-            value = f.read()
-            f.close()
-        return value
+        with open_with_error(self.file) as (f, err):
+            if not err:
+                content = f.read()
+            else:
+                content = '0'
+                logging.error(err)
+            return content
 
     def get_con_used_mem(self):
         return float(self.__get_file_value(self.used_mem_path))

@@ -6,42 +6,21 @@ Created on Sep 8, 2014
 
 import logging
 
-from docker import Client as client
+from docker import Client
 
 
-class Docker_Opers(client):
+class Docker_Opers(Client):
     '''
     classdocs
     '''
-    client = client()
-
     def __init__(self):
         super(Docker_Opers, self).__init__(
             base_url='unix://var/run/docker.sock')
         self.image_cache = []
         self.log = logging.getLogger(__name__)
 
-    def containers(self, quiet=False, all=False, trunc=True, latest=False,
-                   since=None, before=None, limit=-1, size=False):
-        return self.client.containers(quiet,
-                                      all,
-                                      trunc,
-                                      latest,
-                                      since,
-                                      before,
-                                      limit,
-                                      size)
-
-    def inspect_container(self, container):
-        return self.client.inspect_container(container)
-
-
     def retrieve_containers_ids(self):
-        containers_info = self.containers()
-        id_list = []
-        for container_iter in containers_info:
-            id_list.append(container_iter['Id'])
-        return id_list
+        return [c['Id'] for c in self.containers()]
 
     def retrieve_containers_ips(self):
         container_id_list = self.retrieve_containers_ids()
@@ -54,20 +33,13 @@ class Docker_Opers(client):
         return ip_list
 
     def image_name_list(self):
-        image_list = []
-        images = self.client.images()
-        for image in images:
-            for k, v in image.items():
-                if k == 'RepoTags':
-                    image_list.extend(v)
-        return image_list
+        return [i for s in self.images() for i in s.get('RepoTags')]
 
     def image_id_list(self):
-        return self.client.images(quiet=True)
+        return self.images(quiet=True)
 
-    def image_exist(self, image):
-        image_list = self.image_name_list()
-        return image in image_list
+    def image_exist(self, image_name):
+        return image_name in self.image_name_list()
 
     def tag(self, image):
         parts = image.split(':')

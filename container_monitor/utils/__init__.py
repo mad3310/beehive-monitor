@@ -13,6 +13,7 @@ import json
 import os
 import sys
 
+from contextlib import contextmanager
 from tornado.options import options
 from tornado.httpclient import HTTPClient
 from tornado.httpclient import HTTPError
@@ -400,3 +401,14 @@ def check_server_on_zk():
     zk_addr = confDict.get('zkAddress')
     return zk_addr and zk_port
 
+@contextmanager
+def open_with_error(filename, mode="r"):
+    try:
+        f = open(filename, mode)
+    except IOError, err:
+        yield None, err
+    else:
+        try:
+            yield f, None
+        finally:
+            f.close()
