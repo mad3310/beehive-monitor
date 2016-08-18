@@ -48,7 +48,7 @@ class StateOpers(object):
         return con.id()
 
     def __get_file_value(self, file_path):
-        with open_with_error(self.file) as (f, err):
+        with open_with_error(file_path) as (f, err):
             if not err:
                 content = f.read()
             else:
