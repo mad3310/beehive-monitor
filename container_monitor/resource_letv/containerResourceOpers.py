@@ -68,7 +68,8 @@ class ContainerResourceHandler(object):
         获取需要资源采集的容器信息。此处曾可能导致内存溢出，张增排查后并未
         改进代码。现移除原来的局部变量 container_nodes = [], 换用yield。
         """
-        for con_id in self.con_cache.current_ids.copy():
+        current_ids = self.con_cache.current_ids.copy()
+        for con_id in current_ids:
             detail = self.con_cache.find_detail_by_id(con_id)
             # 若当前id不在上一次缓存列表中, 则进行检查
             # 否则在上一次缓存中，表示上一次已经检查过了
@@ -81,6 +82,7 @@ class ContainerResourceHandler(object):
                     detail = None
             if detail is not None:
                 yield detail
+        del current_ids
 
     def write_to_es(self, resource_type, doc, es=es_cluster):
         _now = datetime.utcnow()
