@@ -298,20 +298,24 @@ def dispatch_mutil_task(request_ip_port_params_list, uri, http_method):
 
 def get_containerClusterName_from_containerName(container_name):
     containerClusterName = ''
-    if '-n-4' in container_name:
+    if '-n-4' in container_name and re.search(
+            'd-\w{3,}-(.*)-n-\d', container_name):
         containerClusterName = re.findall(
             'd-\w{3,}-(.*)-n-\d', container_name)[0]
         containerClusterName = '%s_vip' % containerClusterName
-    elif 'd-' in container_name and 'vip' not in container_name:
+    elif 'd-' in container_name and 'vip' not in container_name and \
+        re.search('d-\w{3,}-(.*)-n-\d', container_name):
         containerClusterName = re.findall(
             'd-\w{3,}-(.*)-n-\d', container_name)[0]
-    elif 'd_mcl' in container_name:
+    elif 'd_mcl' in container_name and re.search(
+            'd_mcl_(.*)_node_\d', container_name):
         containerClusterName = re.findall(
             'd_mcl_(.*)_node_\d', container_name)[0]
-    elif 'd-vip' in container_name:
+    elif 'd-vip' in container_name and re.search('d-vip-(.*)', container_name):
         containerClusterName = re.findall('d-vip-(.*)', container_name)[0]
         containerClusterName = '%s_vip' % containerClusterName
-    elif 'doc-mcl' in container_name:
+    elif 'doc-mcl' in container_name and re.search(
+            'doc-mcl-(.*)-n-\d', container_name):
         containerClusterName = re.findall(
             'doc-mcl-(.*)-n-\d', container_name)[0]
     else:
