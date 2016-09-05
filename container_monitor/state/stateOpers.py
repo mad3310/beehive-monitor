@@ -5,10 +5,12 @@ Created on Apr 5, 2015
 '''
 
 import re
+import logging
 
 from docker_letv.dockerOpers import Docker_Opers
 from container.container_model import Container_Model
-from utils import calc_dir_size, get_container_type_from_container_name, disk_stat, timestamp
+from utils import (calc_dir_size, get_container_type_from_container_name,
+                   disk_stat, timestamp, open_with_error)
 from componentProxy import component_mount_map
 
 
@@ -46,11 +48,13 @@ class StateOpers(object):
         return con.id()
 
     def __get_file_value(self, file_path):
-        with open(file_path, 'r') as f:
-            value = f.read()
-            f.close()
-
-        return value
+        with open_with_error(file_path) as (f, err):
+            if not err:
+                content = f.read()
+            else:
+                content = '0'
+                logging.error(err)
+            return content
 
     def get_con_used_mem(self):
         return float(self.__get_file_value(self.used_mem_path))
@@ -69,12 +73,6 @@ class StateOpers(object):
         under_oom_value = re.findall('.*under_oom (\d)$', value)[0]
         return int(under_oom_value)
 
-    def get_memory_stat_value_list(self):
-        value = self.__get_file_value(self.memory_stat_path)
-        if value:
-            return value.split('\n')
-        return []
-
     def get_cpuacct_stat_value(self):
         value = self.__get_file_value(self.cpuacct_stat_path)
         return value.split('\n')
@@ -87,18 +85,12 @@ class StateOpers(object):
 
     def get_memory_stat_item(self):
         mem_stat_dict = {}
-        mem_stat_items = self.get_memory_stat_value_list()
+        with open(self.memory_stat_path, 'r') as f:
+            mem_stat_items = f.readlines()
         for item in mem_stat_items:
-            mem_stat_dict.setdefault('ctime', timestamp())
-            if 'total_rss' in item:
-                total_rss = item.split(' ')[1]
-                mem_stat_dict.setdefault('total_rss', total_rss)
-            elif 'total_swap ' in item:
-                total_swap = item.split(' ')[1]
-                mem_stat_dict.setdefault('total_swap', total_swap)
-            elif 'total_cache ' in item:
-                total_cache = item.split(' ')[1]
-                mem_stat_dict.setdefault('total_cache', total_cache)
+            k, v = item.strip().split()
+            mem_stat_dict.setdefault(k, int(v))
+        mem_stat_dict.setdefault('timestamp', timestamp())
         return mem_stat_dict
 
     def get_oom_kill_disable_value(self):
@@ -159,5 +151,5 @@ class StateOpers(object):
         result.setdefault('volumes_mount', volume_mnt_size)
         result.setdefault('volumes_total', container_mount_diskusage)
         result.setdefault('volumes_ratio', volume_ccupancy_ratio)
-        result.setdefault('ctime', timestamp())
+        result.setdefault('timestamp', timestamp())
         return result

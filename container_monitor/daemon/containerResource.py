@@ -1,12 +1,13 @@
-__author__ = 'mazheng'
+# coding:utf-8
 
 import re
+import logging
 
 from tornado.options import options
 from utils.invokeCommand import InvokeCommand
 from resource_letv.serverResourceOpers import Server_Res_Opers
 from utils.exceptions import UserVisiableException
-from utils import get_dev_number_by_mount_dir, timestamp
+from utils import get_dev_number_by_mount_dir, timestamp, open_with_error
 from componentProxy import component_mount_map
 from appdefine.appDefine import join
 
@@ -43,9 +44,12 @@ class CPURatio(ContainerResource):
 
     def statistic(self):
 
-        with open(self.file, 'r') as f:
-            content = f.read()
-            f.close()
+        with open_with_error(self.file) as (f, err):
+            if not err:
+                content = f.read()
+            else:
+                logging.error(err)
+                return
 
         total_list = content.strip().split('\n')
         tmp_user = int(total_list[0].split()[1])
@@ -153,15 +157,18 @@ class DiskIO(ContainerResource):
         return False
 
     def statistic(self):
-        _file = self.file % self._container_id
         if not re.match("\d+\:\d+", self.dev_number):
             raise UserVisiableException('get device number wrong :%s' % self.dev_number)
 
-        with open(_file, 'r') as f:
-            content = f.read()
-            f.close()
+        _file = self.file % self._container_id
+        with open_with_error(_file) as (f, err):
+            if not err:
+                content = f.read()
+            else:
+                logging.error(err)
+                return
 
-        _read,  _write = 0, 0
+        _read, _write = 0, 0
         _readpattern = '%s Read (\d+ ?)' % self.dev_number
         _writepattern = '%s Write (\d+ ?)' % self.dev_number
         if re.search(_readpattern, content) and \
@@ -181,8 +188,8 @@ class DiskIO(ContainerResource):
     def get_result(self):
         self.statistic()
         result = {
-                  'read' : self.read_iops,
-                  'write' : self.write_iops,
-                  'ctime' : timestamp(),
+            'read': self.read_iops,
+            'write': self.write_iops,
+            'ctime': timestamp(),
         }
         return result
