@@ -45,3 +45,4 @@ define("nsenter", default='nsenter --target `docker inspect -f "{{.State.Pid}}" 
        help="default test cluster network interface card")
 
 define("container_rootfs_size", default=10737418240, help="container default rootfs size")
+define('es_host', default = '127.0.0.1:9200', help = 'es host')

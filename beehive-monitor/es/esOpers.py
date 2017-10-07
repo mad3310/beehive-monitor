@@ -2,12 +2,25 @@
 from elasticsearch import Elasticsearch
 import logging
 import datetime
-from utils.es_utils import es_test_cluster
 
 class esOpers(object):
 
     def __init__(self):
-        self.es = es_test_cluster
+        self.es = None
+        
+    def connect(self, es_host):
+        hosts = map(lambda x:dict(host=x.split(':')[0],
+                                port=x.split(':')[1]),
+                     es_host.split(','),
+                   ) 
+        if not self.es:
+            self.es = Elasticsearch(
+                            hosts,
+                            sniff_on_start=False,
+                            sniff_on_connection_fail=True,
+                            sniffer_timeout=300,
+                            sniff_timeout=10,
+                            )
 
     def get_all_source(self, index, ip, time_from, 
                         time_to, doc_type, size):

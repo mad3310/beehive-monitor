@@ -36,6 +36,9 @@ class ServerRes(object):
 
     def __init__(self):
         self.esOper = esOpers()
+        
+    def connect(self, es_hosts):
+        self.esOper.connect(es_hosts)
 
     def _get_index_name(self, prefix, timestart):
         suffix = timestart.strftime('%Y%m%d')

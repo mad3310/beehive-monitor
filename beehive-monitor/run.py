@@ -15,6 +15,7 @@ from tornado.options import options
 
 from appdefine import appDefine
 from scheduler.scheduler_tasks.schedulerOpers import SchedulerOpers
+from es.serverRes import ServerRes
 
 
 class Application(tornado.web.Application):
@@ -36,6 +37,8 @@ def main():
     tornado.options.parse_command_line()
     http_server = tornado.httpserver.HTTPServer(Application())
     http_server.listen(options.port)
+    
+    ServerRes.connect(options.es_host)
 
     SchedulerOpers()
     tornado.ioloop.IOLoop.instance().start()
