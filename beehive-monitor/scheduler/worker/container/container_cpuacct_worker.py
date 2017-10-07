@@ -3,7 +3,7 @@ __author__ = 'mazheng'
 import sys
 
 from ..base_worker import BaseWorker
-from resource_letv.containerResourceOpers import ContainerCPUAcctHandler
+from resourceForBeehive.containerResourceOpers import ContainerCPUAcctHandler
 
 
 class ContainerCPUAcctWorker(BaseWorker):

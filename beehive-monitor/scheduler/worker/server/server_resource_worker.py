@@ -3,7 +3,7 @@ __author__ = 'mazheng'
 import sys
 
 from scheduler.worker.base_worker import BaseWorker
-from resource_letv.serverResourceOpers import (ServerCPUHandler,
+from resourceForBeehive.serverResourceOpers import (ServerCPUHandler,
                                                ServerMemoryHandler,
                                                ServerDiskusageHandler,
                                                ContainerCountHandler,

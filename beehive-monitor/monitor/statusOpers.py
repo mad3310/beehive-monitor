@@ -6,8 +6,8 @@ import datetime
 from tornado.options import options
 from abc import abstractmethod
 from zk.zkOpers import Scheduler_ZkOpers
-from resource_letv.ipOpers import IpOpers
-from resource_letv.portOpers import PortOpers
+from resourceForBeehive.ipOpers import IpOpers
+from resourceForBeehive.portOpers import PortOpers
 from server.serverOpers import Server_Opers
 from utils import nc_ip_port_available
 from es.serverRes import ServerRes
