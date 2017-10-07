@@ -1,21 +1,21 @@
 #!/bin/sh
 #
-# container-monitor-agent
-# Author: 	zhoubingzheng <zhoubingzheng@letv.com>
+# beehive-monitor
+# Author: 	zhoubingzheng <zhoubingzheng@sina.com>
 #
 # chkconfig: 2345 09 92
-# description: container monitor agent
+# description: beehive monitor
 
 ### BEGIN INIT INFO
-# Provides:          letv
+# Provides:          mad3310
 # Required-Start:
 # Required-Stop:
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: container monitor agent
+# Short-Description: beehive monitor
 ### END INIT INFO
 
-NAME=container-monitor-agent
+NAME=beehive-monitor
 
 # source function library
 . /etc/rc.d/init.d/functions
@@ -39,7 +39,7 @@ start () {
 	touch $PIDFILE
 	chown $USER:$GROUP $PIDFILE
 
-	MMCMD="python2.6 /opt/letv/container-monitor-agent/container_monitor/containerMonitorAgent.pyc >>$CONSOLELOG 2>&1 & 	\
+	MMCMD="python2.7 /opt/beehive-monitor/containerMonitorAgent.pyc >>$CONSOLELOG 2>&1 & 	\
 		echo "'$! >'"$PIDFILE"
 
         echo -n $"Starting ${NAME}:"
