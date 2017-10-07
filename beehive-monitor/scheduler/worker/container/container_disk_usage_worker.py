@@ -3,7 +3,7 @@ __author__ = 'mazheng'
 import sys
 
 from ..base_worker import BaseWorker
-from resource_letv.containerResourceOpers import ContainerDiskUsageHandler
+from resourceForBeehive.containerResourceOpers import ContainerDiskUsageHandler
 
 
 class ContainerDiskUsageWorker(BaseWorker):

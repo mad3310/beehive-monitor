@@ -5,7 +5,7 @@ import logging
 
 from tornado.options import options
 from utils.invokeCommand import InvokeCommand
-from resource_letv.serverResourceOpers import Server_Res_Opers
+from resourceForBeehive.serverResourceOpers import Server_Res_Opers
 from utils.exceptions import UserVisiableException
 from utils import get_dev_number_by_mount_dir, timestamp, open_with_error
 from componentProxy import component_mount_map
