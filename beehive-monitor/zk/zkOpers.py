@@ -20,7 +20,7 @@ class ZkOpers(object):
 
     zk = None
 
-    rootPath = "/letv/docker"
+    rootPath = "/mad3310/docker"
 
     '''
     classdocs
