@@ -10,15 +10,12 @@ base_dir = os.path.abspath(dirname(dirname(__file__)))
 
 define('port', default=6666, type=int, help='app listen port')
 define('debug', default=False, type=bool, help='is debuging?')
-define('sitename', default="container manager", help='site name')
-define('domain', default="letv.com", help='domain name')
+define('sitename', default="beehive-monitor", help='site name')
+define('domain', default="mad3310.com", help='domain name')
 
 define('send_email_switch', default=True, type=bool,
        help='the flag of if send error email')
-define('admins', default=("zhoubingzheng <zhoubingzheng@letv.com>",
-                          "liujinliu <liujinliu@le.com>",
-                          "dengliangju <dengliangju@le.com>",),
-       help='admin email address')
+define('admins', default=("zhoubingzheng <zhoubingzheng@sina.com>",),help='admin email address')
 define('smtp_host', default="10.205.91.22", help='smtp host')
 define('smtp_port', default=587, help='smtp port')
 define('smtp_user', default="mcluster", help='smtp user')
