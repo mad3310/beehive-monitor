@@ -1,5 +1,4 @@
 #!/bin/bash
-mkdir -p /opt/letv
-mkdir -p /var/log/container-monitor-agent
+mkdir -p /var/log/beehive-monitor
 
 exit 0
