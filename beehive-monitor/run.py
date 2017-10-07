@@ -14,7 +14,6 @@ import logging.config
 from tornado.options import options
 
 from appdefine import appDefine
-from check_sync import CheckSync
 from scheduler.scheduler_tasks.schedulerOpers import SchedulerOpers
 
 
