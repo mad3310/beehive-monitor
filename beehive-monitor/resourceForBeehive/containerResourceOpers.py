@@ -9,8 +9,8 @@ from dockerForBeehive.dockerOpers import Docker_Opers
 from zk.zkOpers import Scheduler_ZkOpers
 from state.stateOpers import StateOpers
 from utils import get_containerClusterName_from_containerName, get_container_type_from_container_name
-from utils.es_utils import es_test_cluster as es_cluster
 from daemon.containerResource import NetworkIO, DiskIO, CPURatio
+from es.serverRes import ServerRes
 
 
 class ContainerCache(dict):
@@ -84,14 +84,14 @@ class ContainerResourceHandler(object):
                 yield detail
         del current_ids
 
-    def write_to_es(self, resource_type, doc, es=es_cluster):
+    def write_to_es(self, resource_type, doc):
         _now = datetime.utcnow()
         _date = _now.strftime('%Y%m%d')
         _index = "monitor_container_resource_{0}_{1}".format(resource_type, _date)
         doc.update({
             'timestamp': _now
         })
-        res = es.index(index=_index, doc_type=resource_type, body=doc)
+        ServerRes.index(index=_index, doc_type=resource_type, body=doc)
 
     def gather(self):
         raise NotImplemented("this gather method should be implemented")

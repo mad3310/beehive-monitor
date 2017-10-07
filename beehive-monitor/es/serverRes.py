@@ -94,6 +94,10 @@ class ServerRes(object):
 
     def retireve_server_diskiops(self, ip):
         return self.retireve_server_resource(ip, 'diskiops')
+    
+    def index(self, index, doc_type, body):
+        self.esOper.index(index, doc_type, body)
+        
 
 ServerRes = ServerRes()
 

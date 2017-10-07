@@ -9,8 +9,6 @@ Created on Sep 8, 2014
 from datetime import datetime
 import logging
 
-from tornado.options import options
-
 from componentProxy import component_mount_map
 from container.containerOpers import Container_Opers
 from daemon.serverResource import CPURatio
@@ -18,8 +16,8 @@ from dockerForBeehive.dockerOpers import Docker_Opers
 from utils import diskio
 from utils.invokeCommand import InvokeCommand
 from utils import getHostIp, disk_stat
-from utils.es_utils import es_test_cluster as es_cluster
 from zk.zkOpers import Common_ZkOpers, Scheduler_ZkOpers
+from es.serverRes import ServerRes
 
 
 class Server_Res_Opers():
@@ -103,7 +101,7 @@ class ServerResourceHandler(object):
     def gather(self):
         raise NotImplementedError("the gather method must be implemented")
 
-    def write_to_es(self, resource_type, doc, es=es_cluster):
+    def write_to_es(self, resource_type, doc):
         _now = datetime.utcnow()
         _date = _now.strftime('%Y%m%d')
         _index = "monitor_server_resource_{0}_{1}".format(resource_type, _date)
@@ -111,7 +109,7 @@ class ServerResourceHandler(object):
             'ip': self.ip,
             'timestamp': _now
         })
-        res = es.index(index=_index, doc_type=resource_type, body=doc)
+        ServerRes.index(index=_index, doc_type=resource_type, body=doc)
 
 
 class ServerCPUHandler(ServerResourceHandler):

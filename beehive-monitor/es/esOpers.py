@@ -74,4 +74,6 @@ class esOpers(object):
             logging.error("query in es fail")
             logging.error(e, exc_info=True)
         return ret
-
+    
+    def index(self, index, doc_type, body):
+        self.es(index, doc_type, body)
