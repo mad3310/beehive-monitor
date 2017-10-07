@@ -5,7 +5,7 @@ from collections import namedtuple
 from datetime import datetime
 
 from container.containerOpers import Container_Opers
-from docker_letv.dockerOpers import Docker_Opers
+from dockerForBeehive.dockerOpers import Docker_Opers
 from zk.zkOpers import Scheduler_ZkOpers
 from state.stateOpers import StateOpers
 from utils import get_containerClusterName_from_containerName, get_container_type_from_container_name

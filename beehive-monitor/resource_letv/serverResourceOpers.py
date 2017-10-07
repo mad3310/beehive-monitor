@@ -14,7 +14,7 @@ from tornado.options import options
 from componentProxy import component_mount_map
 from container.containerOpers import Container_Opers
 from daemon.serverResource import CPURatio
-from docker_letv.dockerOpers import Docker_Opers
+from dockerForBeehive.dockerOpers import Docker_Opers
 from utils import diskio
 from utils.invokeCommand import InvokeCommand
 from utils import getHostIp, disk_stat

@@ -7,7 +7,7 @@ Created on Apr 5, 2015
 import re
 import logging
 
-from docker_letv.dockerOpers import Docker_Opers
+from dockerForBeehive.dockerOpers import Docker_Opers
 from container.container_model import Container_Model
 from utils import (calc_dir_size, get_container_type_from_container_name,
                    disk_stat, timestamp, open_with_error)
