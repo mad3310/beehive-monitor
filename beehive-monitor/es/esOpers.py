@@ -1,7 +1,6 @@
 #coding=utf-8
 from elasticsearch import Elasticsearch
 import logging
-import datetime
 
 class esOpers(object):
 
