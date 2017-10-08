@@ -26,8 +26,7 @@ class AdminConf(APIHandler):
 
 
 # create admin user
-# eg. curl -d "adminUser=root&adminPassword=root"
-# "http://localhost:8888/admin/user"
+# eg. curl -d "adminUser=root&adminPassword=root" http://localhost:8888/admin/user
 class AdminUser(APIHandler):
 
     confOpers = ConfigFileOpers()
